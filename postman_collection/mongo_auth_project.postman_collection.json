@@ -1,0 +1,130 @@
+{
+	"info": {
+		"_postman_id": "25a50037-007f-4435-a20d-74aac115ad7e",
+		"name": "mongo_auth_project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\",\r\n    \"repeatPassword\": \"sauravvishal@globussoft.in\",\r\n    \"fullName\": \"Saurav Vishal\",\r\n    \"firstName\": \"Saurav\",\r\n    \"lastName\": \"Vishal\",\r\n    \"phoneNo\": \"+91 9342 234 765\",\r\n    \"address\": \"Bhilai India\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3031/api/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3031/api/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add multiple random user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/register/multiple/random/200",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"register",
+								"multiple",
+								"random",
+								"200"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get loggedin user data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjFhZTU3Y2Y2NzY0OGRlYzQ3YTM4OSIsImlhdCI6MTY2MzE1MTkyNSwiZXhwIjoxNjYzMTU1NTI1fQ.qA77aTUJZdVk0eO-5lD0iL9Rzhu6YQ3AZ2jSPI3NWSo",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/get/userData",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"get",
+								"userData"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
