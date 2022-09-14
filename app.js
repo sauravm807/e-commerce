@@ -15,26 +15,7 @@ const router = require("./routers/main.router");
 
 require("./connection/mongo.connection");
 
-// require("./connection/redis.connection")();
-
-const redis = require('redis');
-
-const client = redis.createClient({
-    socket: {
-        host: 'localhost',
-        port: 6379
-    }
-});
-
-client.on('connect', function () {
-    console.log('Connected to Redis!');
-});
-
-client.on('error', err => {
-    console.log('Error ' + err);
-    throw createError.InternalServerError("Internal server error.")
-});
-
+require("./connection/redis.connection");
 
 app.use(express.json());
 

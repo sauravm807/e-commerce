@@ -3,20 +3,25 @@
 const createError = require('http-errors');
 const redis = require('redis');
 
-module.exports = function () {
-    const client = redis.createClient({
-        socket: {
-            host: 'localhost',
-            port: 6379
-        }
-    });
-    
-    client.on('connect', function () {
-        console.log('Connected to Redis!');
-    });
-    
-    client.on('error', err => {
-        console.log('Error ' + err);
-        throw createError.InternalServerError("Internal server error.")
-    });
-}
+const client = redis.createClient({
+    host: '127.0.0.1',
+    port: 6379
+});
+
+(async()=>{
+    await client.connect();
+});
+
+client.on('error', err => {
+    // console.log('Error ' + err);
+});
+
+client.on('end', err => {
+    console.log('Redis is disconnected.');
+});
+
+process.on('SIGINT', async () => {
+    await client.quit();
+});
+
+module.exports = client;
