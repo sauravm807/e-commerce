@@ -2,8 +2,10 @@
 const createError = require('http-errors');
 
 const { verifyAccessToken, verifyRefreshToken } = require("../services/jwt.service");
+const { setLoggedOutToken, getLoggedOutToken } = require("../services/redis.service");
 
 const User = require("../modal/user/User.modal");
+
 
 module.exports = {
     authenticateAccessToken: async function (req, res, next) {
@@ -16,9 +18,15 @@ module.exports = {
             }
 
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
-            
+
+            const ifLoggedOutToken = await getLoggedOutToken(tokenFromReq);
+           
+            if(ifLoggedOutToken) throw createError.Unauthorized("Token expired");
+
             const payload = await verifyAccessToken(tokenFromReq);
-            
+
+            if (!payload) throw createError.NotFound("Invalid token Access Denied");
+
             const user = await User.findOne({ _id: payload.id });
 
             payload["email"] = user.email;
@@ -27,13 +35,13 @@ module.exports = {
             payload["lastName"] = user.lastName;
             payload["address"] = user.address;
             payload["phoneNo"] = user.phoneNo;
-            
+
             req.user = payload;
             next();
         } catch (error) {
             next(createError.Unauthorized(error));
         }
-    },  
+    },
 
     authenticateRefreshToken: async function (req, res, next) {
         try {
@@ -46,12 +54,23 @@ module.exports = {
 
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 
-            const payload = verifyRefreshToken(tokenFromReq);
+            const payload = await verifyRefreshToken(tokenFromReq);
+            
+            if (!payload) throw createError.NotFound("Invalid token Access Denied");
 
-            req.user = payload;
+            req.userRefresh = payload;
             next();
         } catch (error) {
             next(createError.Unauthorized(error));
         }
+    },
+
+    deleteToken: async function (req, res, next) {
+        let token = req.body.token || req.query.token || req.headers['x-access-token'];
+        const authHeader = req.headers['authorization'];
+        token = authHeader.split(" ")[1];
+
+        setLoggedOutToken(token);
+        next();
     }
 }

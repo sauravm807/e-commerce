@@ -2,10 +2,11 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-  createAccessToken: function (userId) {
+  createAccessToken: function ({ userId, uuid }) {
     return new Promise((resolve, reject) => {
       jwt.sign({
-        id: userId
+        id: userId,
+        uuid: uuid
       }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");
         resolve(token);
@@ -16,9 +17,7 @@ module.exports = {
   verifyAccessToken: function (token) {
     return new Promise((resolve, reject) => {
       jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, function (err, decoded) {
-        if (err) {
-          reject("Invalid token.");
-        }
+        if (err) resolve(false)
         resolve(decoded);
       });
     });
@@ -28,7 +27,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       jwt.sign({
         id: userId
-      }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: 365 * 24 * 60 * 60 }, function (err, token) {
+      }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: 1 * 24 * 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");
         resolve(token);
       });
@@ -37,8 +36,8 @@ module.exports = {
 
   verifyRefreshToken: function (token) {
     return new Promise((resolve, reject) => {
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY, function (err, decoded) {
-        if (err) reject("Internal server error");
+      jwt.verify(token, process.env.REFRESH_TOKEN_SECRET_KEY, function (err, decoded) {
+        if (err) resolve(false);
         resolve(decoded);
       });
     });

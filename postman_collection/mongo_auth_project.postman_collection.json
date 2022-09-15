@@ -74,7 +74,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "http://localhost:3031/api/user/register/multiple/random/200",
+							"raw": "http://localhost:3031/api/user/register/multiple/random/199",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -86,7 +86,7 @@
 								"register",
 								"multiple",
 								"random",
-								"200"
+								"199"
 							]
 						}
 					},
@@ -100,12 +100,12 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjFhZTU3Y2Y2NzY0OGRlYzQ3YTM4OSIsImlhdCI6MTY2MzE1MTkyNSwiZXhwIjoxNjYzMTU1NTI1fQ.qA77aTUJZdVk0eO-5lD0iL9Rzhu6YQ3AZ2jSPI3NWSo",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2Q2OWJlLTk0ZmItNGQyZS1hMzQ0LWUwN2I1ODg4YjcwNyIsImlhdCI6MTY2MzI0NjAyMiwiZXhwIjoxNjYzMzMyNDIyfQ.iYIVi1_-HENx2h8cWcsnwMckxF23ZMHJ5_05T_oDFdM",
 									"type": "string"
 								}
 							]
 						},
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"url": {
 							"raw": "http://localhost:3031/api/user/get/userData",
@@ -119,6 +119,69 @@
 								"user",
 								"get",
 								"userData"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjJkNTcyOTljM2JjNzQ1MTdjNDk5MCIsInV1aWQiOiI4MWFmZWE0NS1hNmJmLTQxYTgtYjM2MC0zNTg4ZDFjYTQ4M2IiLCJpYXQiOjE2NjMyNDQ4OTIsImV4cCI6MTY2MzI0ODQ5Mn0.5--hKuCdzoMhEymfN4BpjTT8tQ5jeH49bQsMHGwBDig",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get tokens by refresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMWJlZGJlLWVhYTMtNGNlMy1iMmFjLWM0NjY2ZGZjZmM5OSIsImlhdCI6MTY2MzI0NzE4NywiZXhwIjoxNjYzMzMzNTg3fQ.VF5kT8Ma5rfQvkz4t3cMQrj3Ofy8z3rlH2nTPJAzvXs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/get/tokens",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"get",
+								"tokens"
 							]
 						}
 					},

@@ -2,8 +2,9 @@
 const userRouter = require("express").Router();
 
 const authController = require("../../controllers/user/auth/auth.controller");
+const userController = require("../../controllers/user/user.controller");
 
-const { authenticateAccessToken } = require("../../middleware/auth.middleware");
+const { authenticateAccessToken, authenticateRefreshToken, deleteToken } = require("../../middleware/auth.middleware");
 
 userRouter.post("/register", authController.registerOneUser);
 
@@ -11,8 +12,12 @@ userRouter.post("/register/multiple/random/:no", authController.registerMultiple
 
 userRouter.post("/login", authController.userLogin);
 
+userRouter.get("/get/tokens", authenticateRefreshToken, authController.generateTokens);
+
 userRouter.use(authenticateAccessToken);
 
-userRouter.post("/get/userData", authController.getUserData);
+userRouter.delete("/logout", deleteToken, authController.userLogout);
+
+userRouter.get("/get/userData", userController.getUserData);
 
 module.exports = userRouter;

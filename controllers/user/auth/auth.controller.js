@@ -15,9 +15,7 @@ const { encryptPassword, matchPassword } = require("../../../services/bcrypt.ser
 const { createUuid } = require("../../../services/uuid.service");
 const {
     createAccessToken,
-    verifyAccessToken,
     createRefreshToken,
-    verifyRefreshToken
 } = require("../../../services/jwt.service");
 
 class AuthController {
@@ -107,7 +105,7 @@ class AuthController {
             const msg = await redisService.getId(user._id);
             if (msg) {
                 const ttl = await redisService.getTtl(user._id);
-                throw createError.Unauthorized(`Login has been blocked try after ${ttl} seconds`);
+                throw createError.BadRequest(`Login has been blocked try after ${ttl} seconds`);
             }
 
             if (!isMatch) {
@@ -126,18 +124,17 @@ class AuthController {
                             wrongPassCount: 0
                         }
                     });
-                    throw createError.Unauthorized(`Login has been blocked try after one minute`);
+                    throw createError.BadRequest(`Login has been blocked try after one minute`);
                 }
             }
 
-            const accessToken = await createAccessToken(user._id); // create access token with payload id
             const uuid = createUuid();
+            const accessToken = await createAccessToken({ userId: user._id, uuid }); // create access token with payload id and uuid
 
             const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
 
             const ifUuidExist = await Uuid.findOne({ userId: user._id });
             if (!ifUuidExist) {
-                // const uuidCreate = new Uuid({ userId: user._id, uuid: uuid });
                 const uuidCreate = new Uuid({ userId: user._id, uuid: [{ _id: uuid, createdAt: new Date().getTime() }] });
 
                 const insertUuid = await uuidCreate.save();
@@ -172,24 +169,68 @@ class AuthController {
     }
 
     /**
-    * getUserData - to get currently logged in user data
-    * @param {*} req 
-    * @param {*} res 
-    * @param {*} next 
-    * @author Saurav Vishal <sauravvishal@globussoft.in>
-    */
-    async getUserData(req, res, next) {
+     * userLogout - to logout tokens sent by user
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @author Saurav Vishal <sauravvishal@globussoft.in>
+     */
+    async userLogout(req, res, next) {
         try {
-            if (!req.user) createError.NotFound("Access token required");
-            const { id, email, fullName, firstName, lastName, address, phoneNo } = req.user;
+            const { id, uuid } = req.user;
+
+            const data = await Uuid.findOne({ userId: id });
+
+            const index = data.uuid.findIndex(item => item._id === uuid);
+
+            const arr = data.uuid.splice(index, 1);
+
+            const updateUuid = await Uuid.updateOne({ _id: data._id }, {
+                $set: {
+                    uuid: data.uuid
+                }
+            });
+
             res.status(200).json({
                 code: 200,
-                data: { id, email, fullName, firstName, lastName, address, phoneNo }
+                message: "Logged out successfully."
             });
         } catch (error) {
             next(error);
         }
     }
+
+    async generateTokens(req, res, next) {
+        try {
+            const { id } = req.userRefresh;
+            console.log(id);
+
+            const user = await Uuid.findOne({
+                uuid: {
+                    $elemMatch: {
+                        _id: id
+                    }
+                }
+            });
+            console.log(user.uuid);
+
+            // const data = await Uuid.findOne({ uuid: id });
+
+            // const index = data.uuid.findIndex(item => item._id === uuid);
+
+            // const arr = data.uuid.splice(index, 1);
+
+            // const updateUuid = await Uuid.updateOne({ _id: data._id }, {
+            //     $set: {
+            //         uuid: data.uuid
+            //     }
+            // });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
 }
 
 module.exports = new AuthController;
