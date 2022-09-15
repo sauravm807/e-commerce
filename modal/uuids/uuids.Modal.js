@@ -12,6 +12,7 @@ const UuidSchema = new Schema({
 
     uuid: [{
         _id: String,
+        token: String,
         createdAt: {
             type: Number
         }

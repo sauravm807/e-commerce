@@ -20,8 +20,8 @@ module.exports = {
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 
             const ifLoggedOutToken = await getLoggedOutToken(tokenFromReq);
-           
-            if(ifLoggedOutToken) throw createError.Unauthorized("Token expired");
+
+            if (ifLoggedOutToken) throw createError.Unauthorized("Token expired");
 
             const payload = await verifyAccessToken(tokenFromReq);
 
@@ -35,6 +35,7 @@ module.exports = {
             payload["lastName"] = user.lastName;
             payload["address"] = user.address;
             payload["phoneNo"] = user.phoneNo;
+            // parload["token"] = token;
 
             req.user = payload;
             next();
@@ -55,7 +56,7 @@ module.exports = {
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 
             const payload = await verifyRefreshToken(tokenFromReq);
-            
+
             if (!payload) throw createError.NotFound("Invalid token Access Denied");
 
             req.userRefresh = payload;
@@ -65,7 +66,7 @@ module.exports = {
         }
     },
 
-    deleteToken: async function (req, res, next) {
+    deleteToken: function (req, res, next) {
         let token = req.body.token || req.query.token || req.headers['x-access-token'];
         const authHeader = req.headers['authorization'];
         token = authHeader.split(" ")[1];

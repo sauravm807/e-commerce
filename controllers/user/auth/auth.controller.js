@@ -7,9 +7,8 @@ const { faker } = require('@faker-js/faker');
 const User = require("../../../modal/user/User.modal");
 const Uuid = require("../../../modal/uuids/uuids.Modal");
 
-const redisService = require("../../../services/redis.service");
-
 // services imports
+const redisService = require("../../../services/redis.service");
 const { userValidateSchemaRegister, userValidateSchemaLogin } = require("../../../validation/user.validation");
 const { encryptPassword, matchPassword } = require("../../../services/bcrypt.service");
 const { createUuid } = require("../../../services/uuid.service");
@@ -135,7 +134,14 @@ class AuthController {
 
             const ifUuidExist = await Uuid.findOne({ userId: user._id });
             if (!ifUuidExist) {
-                const uuidCreate = new Uuid({ userId: user._id, uuid: [{ _id: uuid, createdAt: new Date().getTime() }] });
+                const uuidCreate = new Uuid({
+                    userId: user._id,
+                    uuid: [{
+                        _id: uuid,
+                        token: accessToken,
+                        createdAt: new Date().getTime()
+                    }]
+                });
 
                 const insertUuid = await uuidCreate.save();
 
@@ -148,10 +154,11 @@ class AuthController {
             }
 
             const arr = ifUuidExist.uuid;
-            arr.push({ _id: uuid, createdAt: new Date().getTime() });
+            arr.push({ _id: uuid, token: accessToken, createdAt: new Date().getTime() });
             const updateUuid = await Uuid.updateOne({ _id: ifUuidExist._id }, {
                 $set: {
-                    uuid: arr
+                    uuid: arr,
+
                 }
             });
             if (updateUuid) return res.status(200).json({
@@ -203,7 +210,6 @@ class AuthController {
     async generateTokens(req, res, next) {
         try {
             const { id } = req.userRefresh;
-            console.log(id);
 
             const user = await Uuid.findOne({
                 uuid: {
@@ -212,20 +218,62 @@ class AuthController {
                     }
                 }
             });
-            console.log(user.uuid);
 
-            // const data = await Uuid.findOne({ uuid: id });
+            if (!user?.uuid) throw createError.NotFound("Token not found in db.");
 
-            // const index = data.uuid.findIndex(item => item._id === uuid);
+            const index = user.uuid.findIndex(item => item._id === id);
 
-            // const arr = data.uuid.splice(index, 1);
+            const arr = user.uuid.splice(index, 1);
 
-            // const updateUuid = await Uuid.updateOne({ _id: data._id }, {
-            //     $set: {
-            //         uuid: data.uuid
-            //     }
-            // });
+            const uuid = createUuid();
 
+            user.uuid.push({ _id: uuid, createdAt: new Date().getTime() });
+
+            const updateUuid = await Uuid.updateOne({ _id: user._id }, {
+                $set: {
+                    uuid: user.uuid
+                }
+            });
+
+            const accessToken = await createAccessToken({ userId: user._id, uuid: id });
+
+            const refreshToken = await createRefreshToken(id);
+
+            res.status(200).json({
+                status: 200,
+                message: "Tokens generated successfully",
+                token: { accessToken, refreshToken }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async userLogoutAllTokens(req, res, next) {
+        try {
+            const { id, uuid } = req.user;
+
+            const [data] = await Uuid.find({ userId: id });
+
+            const tokenData = data.uuid;
+
+            const promises = [];
+            
+            tokenData.forEach(item => {
+                promises.push(redisService.setLoggedOutToken(item.token));
+            });
+
+            const result = await Promise.all(promises);
+            const deletedData = await Uuid.deleteOne({ userId: id });
+            console.log(result);
+            console.log(deletedData);
+            if (result.length) return res.status(200).json({
+                code: 200,
+                message: "User logged out from all devices"
+            });
+
+            throw createError.BadRequest("Something went wrong.");
         } catch (error) {
             next(error);
         }
