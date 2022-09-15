@@ -38,6 +38,11 @@ const UserSchema = new Schema({
         type: String
     },
 
+    wrongPassCount: {
+        type: Number,
+        default: 0
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

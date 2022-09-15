@@ -7,6 +7,8 @@ const { faker } = require('@faker-js/faker');
 const User = require("../../../modal/user/User.modal");
 const Uuid = require("../../../modal/uuids/uuids.Modal");
 
+const redisService = require("../../../services/redis.service");
+
 // services imports
 const { userValidateSchemaRegister, userValidateSchemaLogin } = require("../../../validation/user.validation");
 const { encryptPassword, matchPassword } = require("../../../services/bcrypt.service");
@@ -98,20 +100,45 @@ class AuthController {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
             const user = await User.findOne({ email: userData.email }).lean();
-            console.log(user)
-            
+
             if (!user) throw createError.NotFound("Email not found.");
 
             const isMatch = await matchPassword({ password: userData.password, hash: user.password });
-            if (!isMatch) throw createError.Unauthorized("Password do not match.");
+            const msg = await redisService.getId(user._id);
+            if (msg) {
+                const ttl = await redisService.getTtl(user._id);
+                throw createError.Unauthorized(`Login has been blocked try after ${ttl} seconds`);
+            }
+
+            if (!isMatch) {
+                let count = user.wrongPassCount;
+                if (count < 3) {
+                    await User.updateOne({ _id: user._id }, {
+                        $set: {
+                            wrongPassCount: ++count
+                        }
+                    });
+                    throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}`);
+                } else {
+                    const result = await redisService.setId(user._id);
+                    await User.updateOne({ _id: user._id }, {
+                        $set: {
+                            wrongPassCount: 0
+                        }
+                    });
+                    throw createError.Unauthorized(`Login has been blocked try after one minute`);
+                }
+            }
 
             const accessToken = await createAccessToken(user._id); // create access token with payload id
             const uuid = createUuid();
+
             const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
 
             const ifUuidExist = await Uuid.findOne({ userId: user._id });
             if (!ifUuidExist) {
-                const uuidCreate = new Uuid({ userId: user._id, uuid: uuid });
+                // const uuidCreate = new Uuid({ userId: user._id, uuid: uuid });
+                const uuidCreate = new Uuid({ userId: user._id, uuid: [{ _id: uuid, createdAt: new Date().getTime() }] });
 
                 const insertUuid = await uuidCreate.save();
 
@@ -122,8 +149,9 @@ class AuthController {
                     token: { accessToken, refreshToken }
                 });
             }
+
             const arr = ifUuidExist.uuid;
-            arr.push(uuid);
+            arr.push({ _id: uuid, createdAt: new Date().getTime() });
             const updateUuid = await Uuid.updateOne({ _id: ifUuidExist._id }, {
                 $set: {
                     uuid: arr

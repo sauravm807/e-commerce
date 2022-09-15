@@ -1,19 +1,19 @@
 "use strict";
-
-const createError = require('http-errors');
 const redis = require('redis');
 
 const client = redis.createClient({
-    host: '127.0.0.1',
-    port: 6379
+    socket: {
+        host: '127.0.0.1',
+        port: 6379
+    }
 });
 
-(async()=>{
+(async () => {
     await client.connect();
-});
+})();
 
 client.on('error', err => {
-    // console.log('Error ' + err);
+    console.log('Error ' + err);
 });
 
 client.on('end', err => {

@@ -10,12 +10,12 @@ const UuidSchema = new Schema({
         unique: true,
     },
 
-    uuid: { type: Array },
-
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
+    uuid: [{
+        _id: String,
+        createdAt: {
+            type: Number
+        }
+    }]
 });
 
 module.exports = mongoose.model('uuid', UuidSchema);
