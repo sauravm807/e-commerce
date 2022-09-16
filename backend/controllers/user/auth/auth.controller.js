@@ -266,8 +266,7 @@ class AuthController {
 
             const result = await Promise.all(promises);
             const deletedData = await Uuid.deleteOne({ userId: id });
-            console.log(result);
-            console.log(deletedData);
+            
             if (result.length) return res.status(200).json({
                 code: 200,
                 message: "User logged out from all devices"
