@@ -26,15 +26,8 @@ app.use(morgan('dev'));
 /**
  * to generate secret key for tokens
  */
-// (async function () {
-//     try {
-//         const { keyGenerator } = require("./secret_key_generator/secret");
-//         const secretKey = await keyGenerator();
-//         console.log(secretKey);
-//     } catch (error) {
-//         console.log(error);
-//     }
-// })();
+// const { generateSecretKey } = require("./secret_key_generator/secret");
+// generateSecretKey();
 
 app.use("/api", router);
 

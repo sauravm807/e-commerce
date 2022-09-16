@@ -11,4 +11,14 @@ function keyGenerator() {
         });
     });
 }
-module.exports = { keyGenerator } 
+
+async function generateSecretKey() {
+    try {
+        const secretKey = await keyGenerator();
+        console.log(secretKey);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = { generateSecretKey };
