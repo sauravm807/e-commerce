@@ -56,6 +56,7 @@ module.exports = {
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 
             const payload = await verifyRefreshToken(tokenFromReq);
+            console.log(payload);
 
             if (!payload) throw createError.NotFound("Invalid token Access Denied");
 

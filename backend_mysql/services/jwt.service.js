@@ -23,10 +23,11 @@ module.exports = {
     });
   },
 
-  createRefreshToken: function (userId) {
+  createRefreshToken: function (userId,uuid) {
     return new Promise((resolve, reject) => {
       jwt.sign({
-        id: userId
+        userId : userId,
+        id: uuid
       }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: 1 * 24 * 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");
         resolve(token);

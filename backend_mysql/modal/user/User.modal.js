@@ -1,52 +1,46 @@
 "use strict;"
-const mongoose = require("mongoose");
+const {sequelize,Sequelize} = require("../../connection/sql.connection");
+const db = {};
 
-const Schema = mongoose.Schema;
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
 
-const UserSchema = new Schema({
-    email: {
-        type: String,
-        required: true,
+// db.users = require(".././modal/user/User.modal") (sequelize, Sequelize);
+
+    const User = sequelize.define("users", {
+      email: {
+        type: Sequelize.STRING,
+        allowNull: false,
         unique: true
-    },
-
-    fullName: {
-        type: String,
-        required: true,
-    },
-
-    firstName: {
-        type: String,
-        required: true,
-    },
-
-    lastName: {
-        type: String,
-        required: true,
-    },
-
-    password: {
-        type: String,
-        required: true,
-    },
-
-    address: {
-        type: String
-    },
-
-    phoneNo: {
-        type: String
-    },
-
-    wrongPassCount: {
-        type: Number,
-        default: 0
-    },
-
-    createdAt: {
-        type: Date,
-        default: Date.now
-    }
-});
-
-module.exports = mongoose.model('user', UserSchema);
+      },
+      password: {
+        type: Sequelize.STRING,
+        // validate: {
+        //     is: /^[0-9a-f]{64}$/i
+        //   }
+      },
+      fullName: {
+        type: Sequelize.STRING
+      },
+      firstName: {
+        type: Sequelize.STRING
+      },
+      lastName: {
+        type: Sequelize.STRING
+      },
+      repeatPassword: {
+        type: Sequelize.STRING
+      },
+      phoneNo: {
+        type: Sequelize.STRING
+      },
+      address: {
+        type: Sequelize.STRING
+      },
+      wrongPassCount: {
+        type: Sequelize.NUMBER,
+        defaultValue : 0
+      }
+    });
+module.exports = User;
+  

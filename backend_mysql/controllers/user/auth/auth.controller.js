@@ -28,16 +28,16 @@ class AuthController {
      */
     async registerOneUser(req, res, next) {
         try {
+            console.log(req.body);
             const userData = await userValidateSchemaRegister.validateAsync(req.body);
-            const ifUserExist = await User.findOne({ email: userData.email });
+            const ifUserExist = await User.findOne({ where: { email: req.body.email } });
             if (ifUserExist) throw createError.Conflict(`${userData.email} is already present.`);
-
             const password = await encryptPassword(userData.password);
             userData.password = password;
             delete userData.repeatPassword;
-            const user = new User(userData);
-            const insertUser = await user.save();
-            if (!insertUser._id) throw createError.BadRequest("User not created.");
+            const user = await User.create(userData);
+            // const insertUser = await user.save();
+            if (!user) throw createError.BadRequest("User not created.");
             res.status(201).json({
                 status: 201,
                 message: "New user created."
@@ -73,7 +73,7 @@ class AuthController {
                 users.push({ email, password, fullName, firstName, lastName, phoneNo, address, createdAt });
             }
 
-            const insertedData = await User.insertMany(users);
+            const insertedData = await User.bulkCreate(users);
 
             if (!insertedData.length) throw createError.BadRequest("Users not created.");
 
@@ -96,69 +96,68 @@ class AuthController {
     async userLogin(req, res, next) {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
-            const user = await User.findOne({ email: userData.email }).lean();
+            const user = await User.findOne({where :{ email: userData.email }});
 
             if (!user) throw createError.NotFound("Email not found.");
 
             const isMatch = await matchPassword({ password: userData.password, hash: user.password });
-            const msg = await redisService.getId(user._id);
-            if (msg) {
-                const ttl = await redisService.getTtl(user._id);
-                throw createError.BadRequest(`Login has been blocked try after ${ttl} seconds`);
-            }
+            // const msg = await redisService.getId(user.id);
+            // if (msg) {
+            //     const ttl = await redisService.getTtl(user.id);
+            //     throw createError.BadRequest(`Login has been blocked try after ${ttl} seconds`);
+            // }
 
             if (!isMatch) {
                 let count = user.wrongPassCount;
                 if (count < 3) {
-                    await User.updateOne({ _id: user._id }, {
-                        $set: {
-                            wrongPassCount: ++count
+                    await User.update({wrongPassCount: ++count }, {
+                       where: {
+                        id: user.id 
                         }
                     });
                     throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}`);
                 } else {
-                    const result = await redisService.setId(user._id);
-                    await User.updateOne({ _id: user._id }, {
-                        $set: {
-                            wrongPassCount: 0
+                    // const result = await redisService.setId(user.id);
+                    await User.update({ wrongPassCount: 0 }, {
+                       where: {
+                            id: user.id
                         }
                     });
                     throw createError.BadRequest(`Login has been blocked try after one minute`);
                 }
             }
-
+            
             const uuid = createUuid();
-            const accessToken = await createAccessToken({ userId: user._id, uuid }); // create access token with payload id and uuid
+            const accessToken = await createAccessToken({ userId: user.id, uuid }); // create access token with payload id and uuid
+            const refreshToken = await createRefreshToken(user.id,uuid); // create refresh token with payload uuid
+         
 
-            const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
-
-            const ifUuidExist = await Uuid.findOne({ userId: user._id });
+            const ifUuidExist = await Uuid.findOne({where :{ userId: user.id }});
             if (!ifUuidExist) {
-                const uuidCreate = new Uuid({
-                    userId: user._id,
-                    uuid: [{
-                        _id: uuid,
-                        token: accessToken,
-                        createdAt: new Date().getTime()
-                    }]
+                const uuidArr = [{
+                    id: uuid,
+                    token: accessToken,
+                    createdAt: new Date().getTime()
+                }]
+                const uuidCreate = await Uuid.create({
+                    userId: user.id,
+                    uuid: JSON.stringify(uuidArr)
                 });
 
-                const insertUuid = await uuidCreate.save();
+                // const insertUuid = await uuidCreate.save();
 
-                if (!insertUuid) throw createError.BadRequest("Something went wrong.");
+                if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
                 return res.status(200).json({
                     status: 200,
                     message: "Login successfull",
                     token: { accessToken, refreshToken }
                 });
             }
-
-            const arr = ifUuidExist.uuid;
-            arr.push({ _id: uuid, token: accessToken, createdAt: new Date().getTime() });
-            const updateUuid = await Uuid.updateOne({ _id: ifUuidExist._id }, {
-                $set: {
-                    uuid: arr,
-
+            const arr = JSON.parse(ifUuidExist.uuid);
+            arr.push({ id: uuid, token: accessToken, createdAt: new Date().getTime() });
+            const updateUuid = await Uuid.update({  uuid: JSON.stringify(arr) }, {
+                where: {
+                    id: ifUuidExist.id
                 }
             });
             if (updateUuid) return res.status(200).json({
@@ -186,15 +185,15 @@ class AuthController {
         try {
             const { id, uuid } = req.user;
 
-            const data = await Uuid.findOne({ userId: id });
+            const data = await Uuid.findOne({where :{ userId: id }});
 
-            const index = data.uuid.findIndex(item => item._id === uuid);
+            const index = JSON.parse(data.uuid).findIndex(item => item.id === uuid);
 
-            const arr = data.uuid.splice(index, 1);
+            const arr = JSON.parse(data.uuid).splice(index, 1);
 
-            const updateUuid = await Uuid.updateOne({ _id: data._id }, {
-                $set: {
-                    uuid: data.uuid
+            const updateUuid = await Uuid.update({   uuid: JSON.stringify(data.uuid) }, {
+                where: {
+                    id: data.id
                 }
             });
 
@@ -209,35 +208,36 @@ class AuthController {
 
     async generateTokens(req, res, next) {
         try {
-            const { id } = req.userRefresh;
+            const { userId, id } = req.userRefresh;
 
-            const user = await Uuid.findOne({
-                uuid: {
-                    $elemMatch: {
-                        _id: id
-                    }
+            const userData = await Uuid.findOne({
+                where: {
+                    userId: userId
                 }
             });
+            if (!userData) throw createError.NotFound("Token not found in db.");
+            userData.uuid = JSON.parse(userData.uuid);
+            const [user] =  userData.uuid.filter(item => item.id === id);
 
-            if (!user?.uuid) throw createError.NotFound("Token not found in db.");
+            if (!user) throw createError.NotFound("Token not found in db.");
 
-            const index = user.uuid.findIndex(item => item._id === id);
+            const index = userData.uuid.findIndex(item => item.id === id);
 
-            const arr = user.uuid.splice(index, 1);
+            const arr = userData.uuid.splice(index, 1);
 
             const uuid = createUuid();
 
-            user.uuid.push({ _id: uuid, createdAt: new Date().getTime() });
+            userData.uuid.push({ id: uuid, createdAt: new Date().getTime() });
 
-            const updateUuid = await Uuid.updateOne({ _id: user._id }, {
-                $set: {
-                    uuid: user.uuid
+            const updateUuid = await Uuid.update({  uuid: JSON.stringify(user.uuid)  }, {
+                where: {
+                    id: user.id
                 }
             });
 
-            const accessToken = await createAccessToken({ userId: user._id, uuid: id });
+            const accessToken = await createAccessToken({ userId: user.id, uuid: id });
 
-            const refreshToken = await createRefreshToken(id);
+            const refreshToken = await createRefreshToken(user.id,id);
 
             res.status(200).json({
                 status: 200,
@@ -254,9 +254,9 @@ class AuthController {
         try {
             const { id, uuid } = req.user;
 
-            const [data] = await Uuid.find({ userId: id });
+            const data = await Uuid.findOne({where :{ userId: id }});
 
-            const tokenData = data.uuid;
+            const tokenData = JSON.parse(data.uuid);
 
             const promises = [];
             
@@ -265,7 +265,7 @@ class AuthController {
             });
 
             const result = await Promise.all(promises);
-            const deletedData = await Uuid.deleteOne({ userId: id });
+            const deletedData = await Uuid.destroy({where :{ userId: id }});
             
             if (result.length) return res.status(200).json({
                 code: 200,

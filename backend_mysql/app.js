@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 8080;
 
 const router = require("./routers/main.router");
 
-require("./connection/sql.connection");
+const db = require("./connection/sql.connection");
 
 require("./connection/redis.connection");
 

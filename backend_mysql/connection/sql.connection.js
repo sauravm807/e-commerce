@@ -1,6 +1,6 @@
 "use strict";
 const Sequelize = require('sequelize');
-const Sequelize1 = new Sequelize('ecommercedb', 'root',
+const sequelize = new Sequelize('ecommercedb', 'root',
 '', {
 	host: 'localhost',
 	dialect: 'mysql',
@@ -12,11 +12,14 @@ const Sequelize1 = new Sequelize('ecommercedb', 'root',
 	idle: 10000
 	}
 });
-const db = {};
 
-db.Sequelize = Sequelize;
-// db.sequelize = sequelize;
+/* for db synced the schema */
+sequelize.sync()
+  .then(() => {
+    console.log("Synced db.");
+  })
+  .catch((err) => {
+    console.log("Failed to sync db: " + err.message);
+  });
 
-// db.tutorials = require("./tutorial.model.js") (sequelize, Sequelize);
-
-module.exports = Sequelize1;
+module.exports = {sequelize,Sequelize};
