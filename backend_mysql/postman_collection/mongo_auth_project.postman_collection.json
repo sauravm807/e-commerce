@@ -1,0 +1,193 @@
+{
+	"info": {
+		"_postman_id": "25a50037-007f-4435-a20d-74aac115ad7e",
+		"name": "mongo_auth_project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "users",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\",\r\n    \"repeatPassword\": \"sauravvishal@globussoft.in\",\r\n    \"fullName\": \"Saurav Vishal\",\r\n    \"firstName\": \"Saurav\",\r\n    \"lastName\": \"Vishal\",\r\n    \"phoneNo\": \"+91 9342 234 765\",\r\n    \"address\": \"Bhilai India\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3031/api/user/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3031/api/user/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add multiple random user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/register/multiple/random/199",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"register",
+								"multiple",
+								"random",
+								"199"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get loggedin user data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVjN2Q2OWJlLTk0ZmItNGQyZS1hMzQ0LWUwN2I1ODg4YjcwNyIsImlhdCI6MTY2MzI0NjAyMiwiZXhwIjoxNjYzMzMyNDIyfQ.iYIVi1_-HENx2h8cWcsnwMckxF23ZMHJ5_05T_oDFdM",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/get/userData",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"get",
+								"userData"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYzMjJkNTcyOTljM2JjNzQ1MTdjNDk5MCIsInV1aWQiOiI4MWFmZWE0NS1hNmJmLTQxYTgtYjM2MC0zNTg4ZDFjYTQ4M2IiLCJpYXQiOjE2NjMyNDQ4OTIsImV4cCI6MTY2MzI0ODQ5Mn0.5--hKuCdzoMhEymfN4BpjTT8tQ5jeH49bQsMHGwBDig",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get tokens by refresh token",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjExMWJlZGJlLWVhYTMtNGNlMy1iMmFjLWM0NjY2ZGZjZmM5OSIsImlhdCI6MTY2MzI0NzE4NywiZXhwIjoxNjYzMzMzNTg3fQ.VF5kT8Ma5rfQvkz4t3cMQrj3Ofy8z3rlH2nTPJAzvXs",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3031/api/user/get/tokens",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3031",
+							"path": [
+								"api",
+								"user",
+								"get",
+								"tokens"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
