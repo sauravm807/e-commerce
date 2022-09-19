@@ -1,20 +1,33 @@
-.navbar {
-  background: #4b7bec;
+.back-top {
+  background-color: #00A884;
+  height: 13vh;
 }
-.navbar-brand {
-  cursor: pointer;
-  color: #fff !important;
+
+.back-main {
+  background-color: #D9DBD5;
+  height: 87vh;
 }
-.nav-item a.active {
-  color: #000 !important;
+
+.back-container {
+  position: relative;
 }
-a.nav-link {
-  color: #fff !important;
-}
-ul.navbar-nav {
+
+.front-container {
   position: absolute;
-  right: 40px;
+  top: 0;
+  left: 0;
+  right: 0;
 }
-ul.navbar-nav .nav-item {
-  margin: 0 10px;
+
+.front-container1 {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  max-width: 87vw !important;
+}
+
+.front-container {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
 }
