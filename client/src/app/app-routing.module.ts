@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
+import { MessageBodyComponent } from './components/message-body/message-body.component';
 import { RegisterComponent } from './components/register/register.component';
 
 const routes: Routes = [
@@ -17,6 +17,10 @@ const routes: Routes = [
   {
     path: "register",
     component: RegisterComponent
+  },
+  {
+    path: "messages/:id",
+    component: MessageBodyComponent
   }
 ];
 

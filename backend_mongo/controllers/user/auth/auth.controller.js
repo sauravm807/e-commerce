@@ -235,9 +235,9 @@ class AuthController {
                 }
             });
 
-            const accessToken = await createAccessToken({ userId: user._id, uuid: id });
+            const accessToken = await createAccessToken({ userId: user._id, uuid: uuid });
 
-            const refreshToken = await createRefreshToken(id);
+            const refreshToken = await createRefreshToken(uuid);
 
             res.status(200).json({
                 status: 200,
