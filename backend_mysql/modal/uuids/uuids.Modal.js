@@ -9,25 +9,31 @@ db.sequelize = sequelize;
 
     const UuidSchema = sequelize.define("Uuid", {
         userId: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER(11),
         allowNull: false,
-        unique: true,
-        // references : {
-        //     model : 'users',
-        //     key : 'id'
+        references : {
+            model : 'users',
+            key : 'id'
 
-        // }
+        }
       },
       uuid: {
-        type : Sequelize.STRING,
+        type : Sequelize.STRING(255),
+        primaryKey: true,
+        unique : true,
         // uuid_id: Sequelize.STRING,
         // token: Sequelize.STRING,
         allowNull: false,
         // createdAt: true
-    }
+    },
+    token : {
+        type : Sequelize.TEXT('long'),
+        allowNull: false,
+
+    },
     },
     {
-        timestamps: false
+        timestamps: true
       
     });
 module.exports = UuidSchema;

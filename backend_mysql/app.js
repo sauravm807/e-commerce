@@ -9,7 +9,7 @@ const morgan = require('morgan');
 
 require('dotenv').config()
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8088;
 
 const router = require("./routers/main.router");
 
