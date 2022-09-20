@@ -5,6 +5,8 @@ const app = express();
 
 const createError = require('http-errors');
 
+const cors = require('cors')
+
 const morgan = require('morgan');
 
 require('dotenv').config()
@@ -17,11 +19,37 @@ require("./connection/mongo.connection");
 
 require("./connection/redis.connection");
 
+app.use(cors())
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan('dev'));
+
+const server = app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+
+const io = require('socket.io')(server, {
+    cors: {
+        origins: ['http://localhost:4200']
+    }
+});
+
+io.on('connection', (socket) => {
+    console.log('a user connected with id :', socket.id);
+    console.log('if user connected :', socket.connected);
+    socket.on('disconnect', () => {
+        console.log('user disconnected');
+    });
+
+    socket.on('my message', (msg) => {
+        console.log('message: ' + msg);
+    });
+
+    // socket.on('my message', (msg) => {
+    //     io.emit('my broadcast', `server: ${msg}`);
+    // });
+});
 
 /**
  * to generate secret key for tokens
@@ -51,4 +79,3 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));

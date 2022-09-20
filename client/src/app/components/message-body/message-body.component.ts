@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SocketioService } from 'src/app/services/socketio.service';
 
 @Component({
   selector: 'app-message-body',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class MessageBodyComponent implements OnInit {
 
-  constructor() { }
+  constructor(private socketService: SocketioService) { }
 
   ngOnInit(): void {
+    this.socketService.setupSocketConnection();
   }
 
+  ngOnDestroy() {
+    this.socketService.disconnect();
+  }
 }
