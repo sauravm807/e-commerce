@@ -26,6 +26,7 @@ const {
     createAccessToken,
     createRefreshToken,
 } = require("../../../services/jwt.service");
+const sendSMS = require('../../../services/sms.service')
 
 class AuthController {
     /**
@@ -319,7 +320,9 @@ class AuthController {
     }
 
     async forgetPassword(req,res,next){
-        
+        let body = `this is your verification code: ${1234}`
+        let sms = await sendSMS('','',body)
+
     }
 
 }
