@@ -1,0 +1,25 @@
+.back-top {
+  background-color: #00A884;
+  height: 13vh;
+}
+
+.back-main {
+  background-color: #D9DBD5;
+  height: 87vh;
+}
+
+.back-container {
+  position: relative;
+}
+
+.front-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.front-container {
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}

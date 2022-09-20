@@ -6,17 +6,14 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { HeaderComponent } from './components/header/header.component';
-import { FooterComponent } from './components/footer/footer.component';
 import { MessageBodyComponent } from './components/message-body/message-body.component';
+import { SocketioService } from './services/socketio.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HeaderComponent,
-    FooterComponent,
     MessageBodyComponent
   ],
   imports: [
@@ -24,7 +21,7 @@ import { MessageBodyComponent } from './components/message-body/message-body.com
     AppRoutingModule,
     NgbModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [SocketioService],
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

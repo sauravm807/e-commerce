@@ -1,3 +1,12 @@
+.front-container1 {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  max-width: 87vw !important;
+}
+
+
 .chat-main{
   min-height: 100% !important;
 }
@@ -5,6 +14,10 @@
 .chat-top {
   background-color: #EDEDED !important;
   min-height: 50px;
+}
+
+.chat-top-left {
+  border-right: 1px solid #e4e1de;
 }
 
 .profile-image {
@@ -15,22 +28,22 @@
 
 .contacts {
   background-color: #ffffff;
-  min-height: 90vh;
+  /* min-height: 90vh; */
 }
 
 .contact-table-scroll {
   overflow-y: scroll;
-  height: 90vh;
+  height: 88vh;
 }
 
 .message-area {
   background-color: #e4e1de;
-  min-height: 90vh;
+  /* min-height: 90vh; */
 }
 
 .message-table-scroll {
   overflow-y: scroll;
-  height: 83vh;
+  height: 78vh;
 }
 
 .message-box {
@@ -40,23 +53,28 @@
 .sent-msg {
   width:auto;
   float: right !important;
-  max-width: 40%;
-} 
+  max-width: 70%;
+
+}
 
 .sent-msg p {
   background-color: #d9fdd3;
   color: black !important;
+  border-top-right-radius: 20px;
+  border-bottom-left-radius: 20px;
 }
 
 .get-msg {
   width:auto;
   float: left !important;
-  max-width: 40%;
+  max-width: 70%;
 }
 
 .get-msg p {
   background-color: #f0f2f5;
   color: black !important;
+  border-top-left-radius: 20px;
+  border-bottom-right-radius: 20px;
 }
 
 .row {
@@ -66,3 +84,15 @@
 .chat-names {
   cursor: pointer;
 }
+
+.chat-time {
+  display: block;
+  font-size: 8px;
+  text-align: right;
+}
+
+.send-btn {
+  border: none;
+}
+
+
