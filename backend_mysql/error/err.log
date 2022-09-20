@@ -1,0 +1,23 @@
+error: Sep-20-2022 15:13:15: 	404 - undefined - Not Found - /sfefedged - GET - ::1
+error: Sep-20-2022 15:21:26: 	401 - undefined - NotFoundError: Access Denied - /api/user/logindffd - POST - ::1
+error: Sep-20-2022 15:26:06: 	404 - undefined - Token not found in db. - /api/user/get/tokens - GET - ::1
+error: Sep-20-2022 16:15:57: 	401 - undefined - Password do not match. Wrong attempt count 1 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:15:58: 	401 - undefined - Password do not match. Wrong attempt count 2 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:16:00: 	401 - undefined - Password do not match. Wrong attempt count 3 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:16:01: 	400 - undefined - Login has been blocked try after one minute - /api/user/login - POST - ::1
+error: Sep-20-2022 16:16:06: 	400 - undefined - Login has been blocked try after 55 seconds - /api/user/login - POST - ::1
+error: Sep-20-2022 16:18:36: 	401 - undefined - Password do not match. Wrong attempt count 1 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:20:35: 	401 - undefined - Password do not match. Wrong attempt count 2 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:20:36: 	401 - undefined - Password do not match. Wrong attempt count 3 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:20:37: 	400 - undefined - Login has been blocked try after one minute - /api/user/login - POST - ::1
+error: Sep-20-2022 16:20:38: 	400 - undefined - Login has been blocked try after 59 seconds - /api/user/login - POST - ::1
+error: Sep-20-2022 16:22:36: 	401 - undefined - Password do not match. Wrong attempt count 1 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:22:38: 	401 - undefined - Password do not match. Wrong attempt count 2 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:22:39: 	401 - undefined - Password do not match. Wrong attempt count 3 - /api/user/login - POST - ::1
+error: Sep-20-2022 16:22:41: 	400 - undefined - Login has been blocked try after one minute - /api/user/login - POST - ::1
+error: Sep-20-2022 16:26:55: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-20-2022 16:26:57: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-20-2022 16:27:26: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-20-2022 16:27:32: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-20-2022 16:27:33: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-20-2022 16:30:09: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1

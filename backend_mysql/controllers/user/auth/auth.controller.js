@@ -172,7 +172,8 @@ class AuthController {
             const uuidCreate = await Uuid.create({
                 userId: user.id,
                 uuid: uuid,
-                token: accessToken
+                token: accessToken,
+                refreshtoken_expires_time : Math.round(new Date().getTime()/1000) + 24*60*60
             });
 
             if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
@@ -213,8 +214,8 @@ class AuthController {
                 }
             });
 
-            const index = data.filter(item => item.uuid === uuid);
-            if (!index) throw createError.NotFound("Token not found in db.");
+            const tokenData = data.filter(item => item.uuid === uuid);
+            if (!tokenData) throw createError.NotFound("Token not found in db.");
             const deleteUuid = await Uuid.destroy({
                 where: {
                     uuid: uuid
@@ -255,7 +256,8 @@ class AuthController {
             const uuidCreate = await Uuid.create({
                 userId: userId,
                 uuid: uuid,
-                token: accessToken
+                token: accessToken,
+                refreshtoken_expires_time : Math.round(new Date().getTime()/1000) + 24*60*60
             });
 
             if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
@@ -314,6 +316,10 @@ class AuthController {
         } catch (error) {
             next(error);
         }
+    }
+
+    async forgetPassword(req,res,next){
+        
     }
 
 }

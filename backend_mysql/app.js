@@ -14,6 +14,9 @@ const PORT = process.env.PORT || 8088;
 const router = require("./routers/main.router");
 
 const db = require("./connection/sql.connection");
+const jobSchedule = require("./cronJob/job.schedule");
+const logger = require('../backend_mysql/error/logger');
+const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
 
@@ -44,13 +47,14 @@ app.use("/api", router);
 
 app.use((req, res, next) => {
     next(createError(404, "Not Found"));
+    
 });
 
 /**
  * error handler
  */
 app.use((err, req, res, next) => {
-    console.log(err.message);
+    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.status(err.status || 500).json({
         error: {
             status: err.status || 500,
