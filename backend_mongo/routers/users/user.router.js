@@ -20,6 +20,6 @@ userRouter.delete("/logout", deleteToken, authController.userLogout);
 
 userRouter.delete("/logout/all-tokens", authController.userLogoutAllTokens);
 
-userRouter.get("/get/userData", userController.getUserData);
+userRouter.get("/me", userController.getUserData);
 
 module.exports = userRouter;

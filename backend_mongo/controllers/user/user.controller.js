@@ -14,6 +14,7 @@ class UserController {
             
             res.status(200).json({
                 code: 200,
+                message: "Login successfull.",
                 data: { id, email, fullName, firstName, lastName, address, phoneNo }
             });
         } catch (error) {

@@ -164,7 +164,10 @@ class AuthController {
             if (updateUuid) return res.status(200).json({
                 status: 200,
                 message: "Login successfull",
-                token: { accessToken, refreshToken }
+                data: {
+                    id: user._id,
+                    token: { accessToken, refreshToken }
+                }
             });
             throw createError.BadRequest("Something went wrong.");
         } catch (error) {
