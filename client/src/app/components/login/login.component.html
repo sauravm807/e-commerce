@@ -1,23 +1,23 @@
 <div class="container front-container1">
   <div class="container login-top">
     <div class="header">Login</div>
-    <form action="#">
+    <form [formGroup]="userLoginForm"  (submit)="onLogin()">
       <div class="field input-field">
-        <input type="email" required>
+        <input type="email" formControlName="email" required>
         <label>Email Address</label>
       </div>
       <div class="field input-field">
-        <input type="password" autocomplete="new-password" required>
+        <input type="password" autocomplete="new-password" formControlName="password" required>
         <label>Password</label>
       </div>
       <div class="form-link">
-        <a href="#" class="forgot-pass">Forgot password?</a>
+        <a routerLink="/forget-password" class="forgot-pass">Forgot password?</a>
       </div>
       <div class="field button-field">
         <button>Login</button>
       </div>
       <div class="form-link sign-up">
-        <span>Don't have an account?</span> <a href="#">Sign up now</a>
+        <span style="margin-right: 5px;">Don't have an account?</span> <a routerLink="/register">Sign up now</a>
       </div>
     </form>
   </div>
