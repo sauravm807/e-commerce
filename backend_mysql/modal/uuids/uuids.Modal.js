@@ -1,11 +1,13 @@
 "use strict;"
 const {sequelize,Sequelize} = require("../../connection/sql.connection");
 const db = {};
-
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// db.users = require(".././modal/user/User.modal") (sequelize, Sequelize);
+/**
+ * UuidModel - UuidSchema
+ * @author Sibasish Das <sibasishdas@globussoft.in>
+ */
 
     const UuidSchema = sequelize.define("Uuid", {
         userId: {
@@ -21,13 +23,15 @@ db.sequelize = sequelize;
         type : Sequelize.STRING(255),
         primaryKey: true,
         unique : true,
-        // uuid_id: Sequelize.STRING,
-        // token: Sequelize.STRING,
         allowNull: false,
-        // createdAt: true
     },
     token : {
         type : Sequelize.TEXT('long'),
+        allowNull: false,
+
+    },
+    refreshtoken_expires_time : {
+        type :  Sequelize.INTEGER,
         allowNull: false,
 
     },

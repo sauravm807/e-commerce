@@ -3,7 +3,12 @@ const Joi = require('joi');
 
 const userValidateSchemaRegister = Joi.object({
     email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+        .email({
+            minDomainSegments: 2,
+            tlds: {
+                allow: ['com', 'net', 'in']
+            }
+        })
         .required(),
 
     fullName: Joi.string()
@@ -32,12 +37,36 @@ const userValidateSchemaRegister = Joi.object({
 
 const userValidateSchemaLogin = Joi.object({
     email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+        .email({
+            minDomainSegments: 2,
+            tlds: {
+                allow: ['com', 'net', 'in']
+            }
+        })
         .required(),
 
     password: Joi.string()
         .min(8)
         .required()
 });
+const userValidateSchemachangePassword = Joi.object({
+    email: Joi.string()
+        .email({
+            minDomainSegments: 2,
+            tlds: {
+                allow: ['com', 'net', 'in']
+            }
+        })
+        .required(),
 
-module.exports = { userValidateSchemaRegister, userValidateSchemaLogin };
+    password: Joi.string()
+        .min(8)
+        .required(),
+    confirmPassword: Joi.ref('password'),
+});
+
+module.exports = {
+    userValidateSchemaRegister,
+    userValidateSchemaLogin,
+    userValidateSchemachangePassword
+};

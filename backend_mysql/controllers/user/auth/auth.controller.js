@@ -13,7 +13,8 @@ const Uuid = require("../../../modal/uuids/uuids.Modal");
 const redisService = require("../../../services/redis.service");
 const {
     userValidateSchemaRegister,
-    userValidateSchemaLogin
+    userValidateSchemaLogin,
+    userValidateSchemachangePassword
 } = require("../../../validation/user.validation");
 const {
     encryptPassword,
@@ -26,6 +27,7 @@ const {
     createAccessToken,
     createRefreshToken,
 } = require("../../../services/jwt.service");
+const sendSMS = require('../../../services/sms.service')
 
 class AuthController {
     /**
@@ -172,7 +174,8 @@ class AuthController {
             const uuidCreate = await Uuid.create({
                 userId: user.id,
                 uuid: uuid,
-                token: accessToken
+                token: accessToken,
+                refreshtoken_expires_time: Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
             });
 
             if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
@@ -213,8 +216,8 @@ class AuthController {
                 }
             });
 
-            const index = data.filter(item => item.uuid === uuid);
-            if (!index) throw createError.NotFound("Token not found in db.");
+            const tokenData = data.filter(item => item.uuid === uuid);
+            if (!tokenData) throw createError.NotFound("Token not found in db.");
             const deleteUuid = await Uuid.destroy({
                 where: {
                     uuid: uuid
@@ -244,7 +247,7 @@ class AuthController {
             if (!Object.keys(userData).length) throw createError.NotFound("Token not found in db.");
 
             const uuid = createUuid();
-            
+
             const accessToken = await createAccessToken({
                 userId: userId,
                 uuid: uuid
@@ -255,7 +258,8 @@ class AuthController {
             const uuidCreate = await Uuid.create({
                 userId: userId,
                 uuid: uuid,
-                token: accessToken
+                token: accessToken,
+                refreshtoken_expires_time: Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
             });
 
             if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
@@ -264,7 +268,7 @@ class AuthController {
                 where: {
                     uuid: id
                 }
-            }); 
+            });
 
             res.status(200).json({
                 status: 200,
@@ -313,6 +317,138 @@ class AuthController {
             throw createError.BadRequest("Something went wrong.");
         } catch (error) {
             next(error);
+        }
+    }
+
+    async forgetPassword(req, res, next) {
+        try {
+            const {
+                email,
+                number
+            } = req.body;
+            if(!email && !number) throw createError.BadRequest("Email and Number is required.");
+
+            let verifyuser = await User.findOne({
+                where: {
+                    email: email
+                }
+            });
+
+            if (!verifyuser) throw createError.NotFound("Email not found.");
+
+            let randomnumber = Math.floor(
+                Math.random() * (100000, 999999)
+            );
+
+            let smsBody = `this is your verification code: ${randomnumber}`;
+            let sms = await sendSMS('+13605646827', '+917008444956', smsBody)
+            if (!sms) throw createError.BadRequest("Something went wrong!");
+            console.log(sms, 'sms sent');
+            let setotp = await redisService.setVerificationOtp(randomnumber.toString(), verifyuser.email);
+
+            // let updateOtp = await User.update({
+            //     verification_otp: randomnumber,
+            //     otp_expires_time: OTP_expires_time
+            // }, {
+            //     where: {
+            //         email: email
+            //     }
+            // })
+            return res.status(200).json({
+                code: 200,
+                message: "OTP has been sent to your register mobile number !"
+            });
+
+        } catch (error) {
+            console.log(error);
+            next(error);
+        }
+
+    }
+
+    async verifyOtp(req, res, next) {
+        try {
+            const {
+                otp
+            } = req.body;
+
+            if(!otp) throw createError.BadRequest("OTP is required.");
+
+            let verifyotp = await redisService.getVerificationOtp(otp.toString());
+            if (verifyotp) return res.status(200).json({
+                code: 200,
+                message: "OTP matched!"
+            });
+            throw createError.NotFound("Invalid otp!");
+
+        } catch (error) {
+            console.log(error.message);
+            next(error);
+
+        }
+    }
+
+    async resendOtp(req, res, next) {
+        try {
+            const {
+                email
+            } = req.query;
+            if(!email) throw createError.BadRequest("Email is required.");
+            let verifyuser = await User.findOne({
+                where: {
+                    email: email
+                }
+            });
+
+            if (!verifyuser) throw createError.NotFound("Email not found.");
+            let randomnumber = Math.floor(
+                Math.random() * (100000, 999999)
+            );
+            let smsBody = `this is your verification code: ${randomnumber}`;
+            let sms = await sendSMS('+13605646827', '+917008444956', smsBody)
+            if (!sms) throw createError.BadRequest("Something went wrong!");
+            let setotp = await redisService.setVerificationOtp(randomnumber.toString(), verifyuser.email);
+
+            return res.status(200).json({
+                code: 200,
+                message: "OTP has been sent to your register mobile number!"
+            });
+
+        } catch (error) {
+
+            next(error)
+
+        }
+    }
+
+   async changePasword(req, res, next) {
+        try {
+            const user = await userValidateSchemachangePassword.validateAsync(req.body);
+            let verifyuser = await User.findOne({
+                where: {
+                    email: user.email
+                }
+            });
+
+            if (!verifyuser) throw createError.NotFound("Email not found.");
+            const password = await encryptPassword(user.password);
+            user.password = password;
+            let updatePassword = await User.update({
+                password:  user.password
+            }, {
+                where: {
+                    email: user.email
+                }
+            })
+            return res.status(200).json({
+                code: 200,
+                message: "Password change successfully!"
+            });
+
+
+        } catch (error) {
+            next(error)
+
         }
     }
 
