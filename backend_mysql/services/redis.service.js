@@ -43,4 +43,21 @@ module.exports = {
             }
         });
     },
+    setVerificationOtp: function (otp,email) {
+        return new Promise(async (resolve, reject) => {
+            const result = await client.set(otp,email,{EX : 1 * 60 });
+            if (result === "OK") resolve(true);
+            resolve(false);
+        });
+    },
+    getVerificationOtp: function (otp) {
+        return new Promise(async (resolve, reject) => {
+            const result = await client.keys(otp);
+            if (result[0] == otp) {
+                resolve(true)
+            } else {
+                resolve(false)
+            }
+        });
+    },
 }

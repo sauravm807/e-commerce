@@ -21,3 +21,26 @@ error: Sep-20-2022 16:27:26: 	401 - undefined - UnauthorizedError: Token expired
 error: Sep-20-2022 16:27:32: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
 error: Sep-20-2022 16:27:33: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
 error: Sep-20-2022 16:30:09: 	401 - undefined - UnauthorizedError: Token expired - /api/user/logout - DELETE - ::1
+error: Sep-21-2022 10:16:20: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/forget-password - DELETE - ::1
+error: Sep-21-2022 10:16:27: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:16:59: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:17:20: 	401 - undefined - NotFoundError: Access Denied - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:45:46: 	500 - undefined - WHERE parameter "email" has invalid "undefined" value - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:46:03: 	500 - undefined - WHERE parameter "email" has invalid "undefined" value - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:46:34: 	500 - undefined - WHERE parameter "email" has invalid "undefined" value - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:50:19: 	404 - undefined - Email not found. - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 10:50:21: 	404 - undefined - Email not found. - /api/user/forget-password - POST - ::1
+error: Sep-21-2022 11:50:34: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:50:43: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:51:37: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:53:15: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:53:16: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:54:30: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:54:32: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:55:57: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 11:59:30: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 12:00:40: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 12:01:30: 	500 - undefined - undefined - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 12:01:35: 	404 - undefined - Invalid otp! - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 12:28:06: 	400 - undefined - OTP is required. - /api/user/verifyotp - POST - ::1
+error: Sep-21-2022 12:28:08: 	400 - undefined - OTP is required. - /api/user/verifyotp - POST - ::1

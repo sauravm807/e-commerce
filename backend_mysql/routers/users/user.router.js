@@ -14,6 +14,14 @@ userRouter.post("/login", authController.userLogin);
 
 userRouter.get("/get/tokens", authenticateRefreshToken, authController.generateTokens);
 
+userRouter.post("/forgetpassword", authController.forgetPassword);
+
+userRouter.post("/verifyotp", authController.verifyOtp);
+
+userRouter.post("/changepasword", authController.changePasword);
+
+userRouter.post("/resendotp", authController.resendOtp);
+
 userRouter.use(authenticateAccessToken);
 
 userRouter.delete("/logout", deleteToken, authController.userLogout);

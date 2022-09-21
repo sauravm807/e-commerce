@@ -52,6 +52,6 @@ const User = sequelize.define("users", {
     type: Sequelize.INTEGER,
     allowNull: false,
     defaultValue: 0
-  },
+  }
 });
 module.exports = User;

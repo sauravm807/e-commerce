@@ -5,15 +5,19 @@ const client = twilio(
 );
 
 function sendSMS(from, to, body) {
+ return new Promise((resolve, reject) => {
   client.messages
     .create({ from, to, body })
     .then((message) => {
+      resolve(message);
       console.log(
         `SMS message sent from ${from} to ${to}. Message SID: ${message.sid}`
       );
     })
     .catch((error) => {
+      reject(error);
       console.error(error);
     });
+  });
 }
 module.exports = sendSMS;
