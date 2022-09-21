@@ -6,12 +6,12 @@
   max-width: 87vw !important;
 }
 
-.chat-main{
+.chat-main {
   min-height: 100% !important;
 }
 
 .chat-top {
-  background-color: #EDEDED !important;
+  background-color: #ededed !important;
   min-height: 50px;
 }
 
@@ -21,8 +21,9 @@
 
 .profile-image {
   margin-top: 7px;
-  height: 30px;
-  width: 30px;
+  height: 35px;
+  width: 35px;
+  cursor: pointer;
 }
 
 .contacts {
@@ -46,14 +47,14 @@
 }
 
 .message-box {
-  background-color: #F0F0F0;
+  background-color: #f0f0f0;
 }
 
 .sent-msg {
-  width:auto;
+  width: auto;
   float: right !important;
   max-width: 70%;
-
+  cursor: pointer;
 }
 
 .sent-msg p {
@@ -64,9 +65,10 @@
 }
 
 .get-msg {
-  width:auto;
+  width: auto;
   float: left !important;
   max-width: 70%;
+  cursor: pointer;
 }
 
 .get-msg p {
@@ -77,10 +79,10 @@
 }
 
 .row {
-  background-color: #EDEDED;
+  background-color: #ededed;
 }
 
-.chat-names {
+.chat-names-left {
   cursor: pointer;
 }
 
@@ -92,4 +94,26 @@
 
 .send-btn {
   border: none;
+}
+
+.btn-div {
+  float: right;
+}
+
+.logout-btn {
+  margin-top: 10px;
+  font-size: 10px;
+  margin-top: 1rem;
+  background-color: #00a884;
+  border: 1px solid transparent;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.logout-btn:hover {
+  background-color: green;
+}
+
+.left-btn {
+  margin-right: 5px;
 }

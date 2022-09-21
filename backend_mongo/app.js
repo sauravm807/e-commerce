@@ -21,35 +21,21 @@ require("./connection/redis.connection");
 
 app.use(cors())
 
-app.use(express.json());
+app.use(express.json({
+    limit: "50mb",
+    type: 'application/json'
+}));
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+    extended: true,
+    limit: "50mb"
+}));
 
 app.use(morgan('dev'));
 
 const server = app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
 
-const io = require('socket.io')(server, {
-    cors: {
-        origins: ['http://localhost:4200']
-    }
-});
-
-io.on('connection', (socket) => {
-    console.log('a user connected with id :', socket.id);
-    console.log('if user connected :', socket.connected);
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
-
-    socket.on('my message', (msg) => {
-        console.log('message: ' + msg);
-    });
-
-    // socket.on('my message', (msg) => {
-    //     io.emit('my broadcast', `server: ${msg}`);
-    // });
-});
+require("./services/socket/socket.init")(server);
 
 /**
  * to generate secret key for tokens

@@ -1,105 +1,107 @@
 <div class="container front-container1">
-<!-- <div class="chat-main container front-container1"> -->
   <div class="row chat-top">
     <div class="col-sm-4 chat-top-left">
-      <img src="../../../assets/images/p3.jpg" alt="" class="profile-image rounded-circle">
-      <span class="mt-2" style="float: right">
-        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical mr-2" fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd"
-            d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-        </svg>
-      </span>
+      <img src="../../../assets/images/p3.jpg" alt="" class="profile-image rounded-circle" (click)="showFileUpload()">
+      <input (change)="onFileSelected($event)" hidden="true" id="imageUpload" name="image" type="file"
+       accept=".png, .jpg, .jpeg" required ngModel #cngPic="ngModel">
+
+      <div class="btn-div">
+        <button class="logout-btn left-btn" (click)="onLogout()">Logout</button>
+        <button class="logout-btn" (click)="onLogoutAllDevices()">Logout from all devices</button>
+      </div>
     </div>
-    <div class="col-sm-8">
-      <img src="../../../assets/images/p2.jpg" alt="" class="profile-image rounded-circle">
-      <span class="ml-2">Rahul Kumar</span>
-      <span class="mt-2" style="float: right">
-        <button style="border: none"><i class="fa fa-search" aria-hidden="true"></i></button>
-        <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical mx-3" fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd"
-            d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
-        </svg>
-      </span>
-    </div>
+
+    <ng-container *ngIf="showMessages">
+      <div class="col-sm-8">
+        <img src="../../../assets/images/p2.jpg" alt="" class="profile-image rounded-circle">
+        <span class="ml-2">Rahul Kumar</span>
+        <span class="mt-2" style="float: right">
+          <button style="border: none"><i class="fa fa-search" aria-hidden="true"></i></button>
+          <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-three-dots-vertical mx-3" fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z" />
+          </svg>
+        </span>
+      </div>
+    </ng-container>
   </div>
   <div class="row chat-bottom">
     <div class="col-sm-4 contacts">
       <div class="contact-table-scroll">
         <table class="table table-hover">
           <tbody>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p2.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Rahul Kumar <br> <small>achi chal rahi</small></td>
               <td><small>11:55 PM</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Jack <br> <small>Bye tata</small></td>
               <td><small>10:09 PM</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p4.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Bullywood Mafia <br> <small>Drg Drg Drg</small></td>
               <td><small>Monday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Sumit Jha<br> <small>Corona ho gaya kya</small></td>
               <td><small>9/22/20</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p6.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>News Channel <br> <small>Bekar news only</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Ali <br> <small>Hello</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p5.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Afreen <br> <small>Nahi main nahi janti</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Geeky Shows <br> <small>PPT nahi mila</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Sofia <br> <small>God Bless You</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
             </tr>
-            <tr class="chat-names">
+            <tr class="chat-names-left" (click)="onShowMessage()">
               <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
               <td>Kunal <br> <small>Nikl lo</small></td>
               <td><small>Sunday</small></td>
@@ -111,101 +113,107 @@
     </div>
     <div class="col-sm-8 message-area">
       <div class="message-table-scroll">
-        <table class="table">
-          <tbody>
-            <tr class="chat-names">
-              <td class="get-msg">
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left ">
-                  Hello Rahul <span class="chat-time">11:20 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class=sent-msg>
-                <p class="p-2 mt-2 mr-5 shadow-sm text-white float-right ">
-                  Hello Sonam How are You <span class="chat-time">11:21 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class="get-msg">
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                  Main achi hu tum kaise ho Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum ab quis
-                  quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam repellendus
-                  in mollitia error. Nulla officia fuga iure sunt! Lorem ipsum dolor sit, amet consectetur adipisicing
-                  elit. Illum ab quis
-                  quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam repellendus
-                  in mollitia error. Nulla officia fuga iure sunt!<span class="chat-time">11:21 PM</span></p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class="get-msg">
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                  Suna hai tumhari Job chali gayi ya chhod di tumne
-                  <span class="chat-time">11:22 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class=sent-msg>
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">Haan Lockdown ki wajah
-                  se company me kuch problem ho rahi thi so kuch logo ko resign dene ko kaha gaya tha.. meri
-                  condition thodi thik hai to maine socha main hi kar deta hu.. mere pas paisa bahot hai...
-                  <span class="chat-time">11:24 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class="get-msg">
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                  acha <span class="chat-time">11:24 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class=sent-msg>
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                  Haan <span class="chat-time">11:25 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class=sent-msg>
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                  aur tumhari job kaisi chali rahi <span class="chat-time">11:26 PM</span>
-                </p>
-              </td>
-            </tr>
-            <tr class="chat-names">
-              <td class="get-msg">
-                <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                  achi chal rahi <span class="chat-time">11:26 PM</span>
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <ng-container *ngIf="showMessages">
+          <table class="table">
+            <tbody>
+              <tr class="chat-names">
+                <td class="get-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left ">
+                    Hello Rahul <span class="chat-time">11:20 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class=sent-msg>
+                  <p class="p-2 mt-2 mr-5 shadow-sm text-white float-right ">
+                    Hello Sonam How are You <span class="chat-time">11:21 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class="get-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                    Main achi hu tum kaise ho Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum ab quis
+                    quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam
+                    repellendus
+                    in mollitia error. Nulla officia fuga iure sunt! Lorem ipsum dolor sit, amet consectetur adipisicing
+                    elit. Illum ab quis
+                    quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam
+                    repellendus
+                    in mollitia error. Nulla officia fuga iure sunt!<span class="chat-time">11:21 PM</span></p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class="get-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                    Suna hai tumhari Job chali gayi ya chhod di tumne
+                    <span class="chat-time">11:22 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class=sent-msg>
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">Haan Lockdown ki wajah
+                    se company me kuch problem ho rahi thi so kuch logo ko resign dene ko kaha gaya tha.. meri
+                    condition thodi thik hai to maine socha main hi kar deta hu.. mere pas paisa bahot hai...
+                    <span class="chat-time">11:24 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class="get-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                    acha <span class="chat-time">11:24 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class=sent-msg>
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
+                    Haan <span class="chat-time">11:25 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class=sent-msg>
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
+                    aur tumhari job kaisi chali rahi <span class="chat-time">11:26 PM</span>
+                  </p>
+                </td>
+              </tr>
+              <tr class="chat-names">
+                <td class="get-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                    achi chal rahi <span class="chat-time">11:26 PM</span>
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
       </div>
       <div class="row message-box p-3">
-        <div class="col-sm-2 mt-1">
-          <button class="send-btn">
-            <i class="fa fa-smile-o" aria-hidden="true"></i>
-          </button>
-          <button class="send-btn">
-            <i class="fa fa-paperclip" aria-hidden="true"></i>
-          </button>
-        </div>
-        <div class="col-sm-9">
-          <form action="">
-            <input type="text" class="form-control" placeholder="Write message...">
-          </form>
+        <ng-container *ngIf="showMessages">
+          <div class="col-sm-2 mt-1">
+            <button class="send-btn">
+              <i class="fa fa-smile-o" aria-hidden="true"></i>
+            </button>
+            <button class="send-btn">
+              <i class="fa fa-paperclip" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="col-sm-9">
+            <form action="">
+              <input type="text" class="form-control" placeholder="Write message...">
+            </form>
 
-        </div>
-        <div class="col-sm-1 mt-1">
-          <button class="send-btn">
-            <i class="fa fa-paper-plane"></i>
-          </button>
-        </div>
+          </div>
+          <div class="col-sm-1 mt-1">
+            <button class="send-btn">
+              <i class="fa fa-paper-plane"></i>
+            </button>
+          </div>
+        </ng-container>
       </div>
     </div>
   </div>

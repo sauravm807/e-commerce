@@ -15,9 +15,9 @@ export class SocketioService {
     this.socket.on("connect", () => {
       console.log(this.socket.id)
     });
-    this.socket.on('my broadcast', (data: string) => {
-      console.log(data);
-    });
+    // this.socket.on('my broadcast', (data: string) => {
+    //   console.log(data);
+    // });
   }
 
   disconnect() {

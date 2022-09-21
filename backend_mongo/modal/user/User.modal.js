@@ -38,6 +38,11 @@ const UserSchema = new Schema({
         type: String
     },
 
+    proPic: {
+        type: String,
+        default: null
+    },
+
     wrongPassCount: {
         type: Number,
         default: 0

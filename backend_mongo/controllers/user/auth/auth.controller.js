@@ -149,7 +149,10 @@ class AuthController {
                 return res.status(200).json({
                     status: 200,
                     message: "Login successfull",
-                    token: { accessToken, refreshToken }
+                    data: {
+                        id: user._id,
+                        token: { accessToken, refreshToken }
+                    }
                 });
             }
 
@@ -262,14 +265,14 @@ class AuthController {
             const tokenData = data.uuid;
 
             const promises = [];
-            
+
             tokenData.forEach(item => {
                 promises.push(redisService.setLoggedOutToken(item.token));
             });
 
             const result = await Promise.all(promises);
             const deletedData = await Uuid.deleteOne({ userId: id });
-            
+
             if (result.length) return res.status(200).json({
                 code: 200,
                 message: "User logged out from all devices"

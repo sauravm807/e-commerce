@@ -6,6 +6,8 @@ import { LoginComponent } from './components/login/login.component';
 import { MessageBodyComponent } from './components/message-body/message-body.component';
 import { RegisterComponent } from './components/register/register.component';
 import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
+import { AuthGuard } from './guards/auth.guard';
+import { LoginGuard } from './guards/login.guard';
 
 const routes: Routes = [
   {
@@ -15,27 +17,27 @@ const routes: Routes = [
   },
   {
     path: "login",
-    component: LoginComponent
+    component: LoginComponent, canActivate: [LoginGuard]
   },
   {
     path: "register",
-    component: RegisterComponent
+    component: RegisterComponent, canActivate: [LoginGuard]
   },
   {
     path: "forget-password",
-    component: ForgetPasswordComponent
+    component: ForgetPasswordComponent, canActivate: [LoginGuard]
   },
   {
     path: "change-password",
-    component: ChangePasswordComponent
+    component: ChangePasswordComponent, canActivate: [LoginGuard]
   },
   {
     path: "otp-verify",
-    component: VerifyOtpComponent
+    component: VerifyOtpComponent, canActivate: [LoginGuard]
   },
   {
     path: "messages/:id",
-    component: MessageBodyComponent
+    component: MessageBodyComponent, canActivate: [AuthGuard]
   }
 ];
 

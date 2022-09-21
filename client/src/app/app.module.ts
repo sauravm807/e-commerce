@@ -13,8 +13,9 @@ import { MessageBodyComponent } from './components/message-body/message-body.com
 import { SocketioService } from './services/socketio.service';
 import { ForgetPasswordComponent } from './components/forget-password/forget-password.component';
 import { ChangePasswordComponent } from './components/change-password/change-password.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component';
+import { AuthInterceptor } from './auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component
     HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
+    FormsModule,
     ToastrModule.forRoot({
       timeOut: 2000,
       positionClass: 'toast-top-right',
@@ -40,7 +42,14 @@ import { VerifyOtpComponent } from './components/verify-otp/verify-otp.component
       progressBar: true
     })
   ],
-  providers: [SocketioService],
+  providers: [
+    SocketioService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule { }
