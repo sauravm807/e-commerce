@@ -22,4 +22,6 @@ userRouter.delete("/logout/all-tokens", authController.userLogoutAllTokens);
 
 userRouter.get("/me", userController.getUserData);
 
+userRouter.post("/upload/propic", userController.uploadProfilePic);
+
 module.exports = userRouter;

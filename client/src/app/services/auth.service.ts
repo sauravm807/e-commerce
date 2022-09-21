@@ -15,7 +15,27 @@ export class AuthService {
     localStorage.setItem("refreshToken", tokens.refreshToken);
   }
 
+  getAccessToken() {
+    return localStorage.getItem("accessToken");
+  }
+
+  getRefreshToken() {
+    return localStorage.getItem("refreshToken");
+  }
+
   userLogin(data: any): Observable<any> {
     return this.http.post(`${this.URL}/user/login`, data);
+  }
+
+  getUserLoggedInData(): Observable<any> {
+    return this.http.get(`${this.URL}/user/me`);
+  }
+
+  userLogout() {
+    return this.http.delete(`${this.URL}/user/logout`);
+  }
+
+  userLogoutAllDevices() {
+    return this.http.delete(`${this.URL}/user/logout/all-tokens`);
   }
 }

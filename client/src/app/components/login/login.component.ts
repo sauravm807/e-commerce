@@ -44,9 +44,8 @@ export class LoginComponent implements OnInit {
 
     this.authService.userLogin(this.userLoginForm.value).subscribe({
       next: res => {
-        console.log(res.data.token)
-        this.authService.saveToken(res.data.token);
         this.toastr.success(res.message);
+        this.authService.saveToken(res.data.token);
         this.router.navigate(["messages", res.data.id]);
       },
       error: err => {
