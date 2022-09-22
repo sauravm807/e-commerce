@@ -66,13 +66,13 @@ class AuthController {
                 const firstName = fullName.split(" ")[0];
                 const lastName = fullName.split(" ")[1];
                 const email = faker.internet.email(fullName).toLowerCase();
-                const phoneNo = faker.phone.number('+91 #### ### ###');
+                const phoneNo = faker.phone.number('+91##########');
                 const createdAt = faker.date.between('2021-01-01T00:00:00.000Z', '2022-06-06T00:00:00.000Z')
                 const address = `${faker.address.buildingNumber()} ${faker.address.cardinalDirection()} ${faker.address.city()} ${faker.address.state()}`;
                 const password = await encryptPassword(email);
                 users.push({ email, password, fullName, firstName, lastName, phoneNo, address, createdAt });
             }
-
+            
             const insertedData = await User.insertMany(users);
 
             if (!insertedData.length) throw createError.BadRequest("Users not created.");

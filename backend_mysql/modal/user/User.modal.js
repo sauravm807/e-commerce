@@ -43,7 +43,7 @@ const User = sequelize.define("users", {
     type: Sequelize.STRING
   },
   phoneNo: {
-    type: Sequelize.INTEGER
+    type: Sequelize.STRING
   },
   address: {
     type: Sequelize.STRING

@@ -19,6 +19,10 @@
   border-right: 1px solid #e4e1de;
 }
 
+.left-top-div {
+  display: inline;
+}
+
 .profile-image {
   margin-top: 7px;
   height: 35px;
@@ -26,9 +30,13 @@
   cursor: pointer;
 }
 
+.search-input {
+  display: inline !important;
+  width: 100% !important;
+}
+
 .contacts {
   background-color: #ffffff;
-  /* min-height: 90vh; */
 }
 
 .contact-table-scroll {
@@ -116,8 +124,4 @@
 
 .left-btn {
   margin-right: 10px;
-}
-
-.search-btn {
-  border: none;
 }

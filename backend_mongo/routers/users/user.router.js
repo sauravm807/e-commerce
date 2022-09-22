@@ -24,4 +24,6 @@ userRouter.get("/me", userController.getUserData);
 
 userRouter.post("/upload/propic", userController.uploadProfilePic);
 
+userRouter.post("/search", userController.searchUser);
+
 module.exports = userRouter;
