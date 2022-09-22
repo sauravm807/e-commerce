@@ -24,6 +24,7 @@ export class AuthGuard implements CanActivate {
     return this.authService.getUserLoggedInData()
       .pipe(
         map(res => {
+          this.authService.userData.next(res.data);
           return true;
         }),
         catchError(() => {

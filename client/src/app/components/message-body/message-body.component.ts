@@ -13,7 +13,9 @@ declare var $: any;
 })
 export class MessageBodyComponent implements OnInit {
 
-  showMessages: boolean = false;
+  showMessages: boolean = true;
+  userData: any = {};
+  basePath: string = "";
 
   constructor(
     private socketService: SocketioService,
@@ -24,6 +26,10 @@ export class MessageBodyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.basePath = this.authService.BASEURL + "/assets/profile_pics/";
+    this.authService.userDataMessage.subscribe(res => {
+      this.userData = res;
+    });
     this.socketService.setupSocketConnection();
   }
 
@@ -102,14 +108,26 @@ export class MessageBodyComponent implements OnInit {
   }
 
   uploadProfileImage(imageData: any) {
-    console.log(imageData)
     this.userService.uploadProfilePic(imageData).subscribe({
       next: res => {
-
+        this.refreshUserData();
       },
       error: err => {
-
+        console.log(err);
       }
     })
+  }
+
+  onImgError(event: Event) {
+    let imgLink = this.userService.handleImageError();
+    (event.target as HTMLInputElement).src = imgLink;
+    this.userData["proPic"] = imgLink;
+  }
+
+  refreshUserData() {
+    this.authService.getUserLoggedInData().subscribe(res => {
+      this.authService.userData.next(res.data);
+      return true;
+    });
   }
 }
