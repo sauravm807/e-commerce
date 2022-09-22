@@ -14,6 +14,7 @@ declare var $: any;
 export class MessageBodyComponent implements OnInit {
 
   showMessages: boolean = true;
+  showInput: boolean = true;
   userData: any = {};
   basePath: string = "";
 
@@ -35,6 +36,10 @@ export class MessageBodyComponent implements OnInit {
 
   ngOnDestroy() {
     this.socketService.disconnect();
+  }
+
+  onShowInput() {
+    this.showInput = !this.showInput;
   }
 
   /**
