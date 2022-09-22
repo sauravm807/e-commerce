@@ -35,7 +35,7 @@ module.exports = {
             payload["lastName"] = user.lastName;
             payload["address"] = user.address;
             payload["phoneNo"] = user.phoneNo;
-            // parload["token"] = token;
+            payload["proPic"] = user.proPic;
 
             req.user = payload;
             next();

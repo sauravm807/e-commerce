@@ -1,10 +1,9 @@
 "use strict;"
 // helper functions imports
-const { uploadPic } = require("../../services/helper/uploadPic.service");
+const { uploadPic, removePic } = require("../../services/helper/uploadPic.service");
 
 // modals imports
 const User = require("../../modal/user/User.modal");
-
 class UserController {
     /**
     * getUserData - to get currently logged in user data
@@ -16,11 +15,11 @@ class UserController {
     async getUserData(req, res, next) {
         try {
             if (!req.user) createError.NotFound("Access token required");
-            const { id, email, fullName, firstName, lastName, address, phoneNo } = req.user;
+            const { id, email, fullName, firstName, lastName, address, phoneNo, proPic } = req.user;
             res.status(200).json({
                 status: 200,
                 message: "Login successfull.",
-                data: { id, email, fullName, firstName, lastName, address, phoneNo }
+                data: { id, email, fullName, firstName, lastName, address, phoneNo, proPic }
             });
         } catch (error) {
             next(error);
@@ -40,20 +39,25 @@ class UserController {
             let { base64, type } = req.body;
             if (!base64 || !type) createError.BadRequest("Image data is required.");
             const isUploadImagePath = await uploadPic({ base64, type, id });
-            console.log(isUploadImagePath)
             if (!isUploadImagePath) return res.status(400).json({
                 status: 400,
                 message: "Something went wrong",
             });
 
+            const { proPic } = await User.findOne({ _id: id }, { proPic: 1, _id: 0 });
+
             await User.updateOne({ _id: id }, {
                 $set: {
-                    id: isUploadImagePath
+                    proPic: isUploadImagePath
                 }
             });
-            return res.status(201).json({
+            
+            if (proPic) await removePic(proPic);
+
+            res.status(201).json({
                 status: 201,
                 message: "Image uploaded successfully",
+                imagePath: isUploadImagePath
             });
         } catch (error) {
             next(error);

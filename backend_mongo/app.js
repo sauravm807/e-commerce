@@ -19,7 +19,9 @@ require("./connection/mongo.connection");
 
 require("./connection/redis.connection");
 
-app.use(cors())
+app.use(cors());
+
+app.use(express.static('public'));
 
 app.use(express.json({
     limit: "50mb",
