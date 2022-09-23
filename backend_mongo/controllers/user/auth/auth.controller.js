@@ -72,7 +72,7 @@ class AuthController {
                 const password = await encryptPassword(email);
                 users.push({ email, password, fullName, firstName, lastName, phoneNo, address, createdAt });
             }
-            
+
             const insertedData = await User.insertMany(users);
 
             if (!insertedData.length) throw createError.BadRequest("Users not created.");
@@ -128,7 +128,7 @@ class AuthController {
             }
 
             const uuid = createUuid();
-            const accessToken = await createAccessToken({ userId: user._id, uuid }); // create access token with payload id and uuid
+            const accessToken = await createAccessToken({ user: user, uuid }); // create access token with payload id and uuid
 
             const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
 
@@ -216,7 +216,6 @@ class AuthController {
     async generateTokens(req, res, next) {
         try {
             const { id } = req.userRefresh;
-
             const user = await Uuid.findOne({
                 uuid: {
                     $elemMatch: {
@@ -241,10 +240,12 @@ class AuthController {
                 }
             });
 
-            const accessToken = await createAccessToken({ userId: user._id, uuid: uuid });
+            const userData = await User.findOne({ _id: user.userId });
+            
+            const accessToken = await createAccessToken({ user: userData, uuid: uuid });
 
             const refreshToken = await createRefreshToken(uuid);
-
+            
             res.status(200).json({
                 status: 200,
                 message: "Tokens generated successfully",

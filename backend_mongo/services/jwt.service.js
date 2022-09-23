@@ -2,10 +2,15 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-  createAccessToken: function ({ userId, uuid }) {
+  createAccessToken: function ({ user, uuid }) {
     return new Promise((resolve, reject) => {
+      console.log(user)
       jwt.sign({
-        id: userId,
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         uuid: uuid
       }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");

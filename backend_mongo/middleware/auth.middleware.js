@@ -25,17 +25,7 @@ module.exports = {
 
             const payload = await verifyAccessToken(tokenFromReq);
 
-            if (!payload) throw createError.NotFound("Invalid token Access Denied");
-
-            const user = await User.findOne({ _id: payload.id });
-
-            payload["email"] = user.email;
-            payload["fullName"] = user.fullName;
-            payload["firstName"] = user.firstName;
-            payload["lastName"] = user.lastName;
-            payload["address"] = user.address;
-            payload["phoneNo"] = user.phoneNo;
-            payload["proPic"] = user.proPic;
+            if (!payload) throw createError.Unauthorized("Invalid token Access Denied");
 
             req.user = payload;
             next();

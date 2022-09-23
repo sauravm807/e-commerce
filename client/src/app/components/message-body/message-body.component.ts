@@ -30,6 +30,7 @@ export class MessageBodyComponent implements OnInit {
     this.basePath = this.authService.BASEURL + "/assets/profile_pics/";
     this.authService.userDataMessage.subscribe(res => {
       this.userData = res;
+      console.log(this.userData)
     });
     this.socketService.setupSocketConnection();
   }

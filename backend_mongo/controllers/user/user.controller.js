@@ -5,7 +5,6 @@ const { uploadPic, removePic } = require("../../services/helper/uploadPic.servic
 
 // modals imports
 const User = require("../../modal/user/User.modal");
-const { search } = require('../../routers/users/user.router');
 class UserController {
     /**
     * getUserData - to get currently logged in user data
@@ -17,11 +16,16 @@ class UserController {
     async getUserData(req, res, next) {
         try {
             if (!req.user) throw createError.NotFound("Access token required");
-            const { id, email, fullName, firstName, lastName, address, phoneNo, proPic } = req.user;
+            const { id, email, fullName, firstName, lastName } = req.user;
+
+            const { address, proPic, phoneNo } = await User.findOne({ _id: id }, {
+                proPic: 1, address: 1,
+                phoneNo: 1, _id: 0
+            });
             res.status(200).json({
                 status: 200,
                 message: "Login successfull.",
-                data: { id, email, fullName, firstName, lastName, address, phoneNo, proPic }
+                data: { id, email, fullName, firstName, lastName, address, proPic, phoneNo }
             });
         } catch (error) {
             next(error);
@@ -86,8 +90,8 @@ class UserController {
             });
 
             db.users.aggregate([
-                {$match: { email: { $regex: '.*' + "sau" + '.*' } }}
-             ])
+                { $match: { email: { $regex: '.*' + "sau" + '.*' } } }
+            ])
 
             // db.users.aggregate([
             //     {$match: { email: { $regex: '.*' + "sau" + '.*' } }},
@@ -96,9 +100,9 @@ class UserController {
             //    {$match: { fullName: { $regex: '.*' + "sau" + '.*' } }},
             //     {$match: { phoneNo: { $regex: '.*' + "sau" + '.*' } }}
             //  ])
-            
+
             if (!data.length) throw createError.NotFound("No users found.")
-            
+
             res.status(200).json({
                 status: 200,
                 message: "User fetched successfully",

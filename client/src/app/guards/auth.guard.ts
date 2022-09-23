@@ -28,11 +28,11 @@ export class AuthGuard implements CanActivate {
           return true;
         }),
         catchError(() => {
-          this.router.navigate(['/login']);
-          this.toastr.info("Please login first.");
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          return of(false)
+          this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+          // this.toastr.info("Please login first.");
+          // localStorage.removeItem("accessToken");
+          // localStorage.removeItem("refreshToken");
+          return of(false);
         })
       );
   }
