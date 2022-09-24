@@ -4,7 +4,6 @@ const jwt = require('jsonwebtoken');
 module.exports = {
   createAccessToken: function ({ user, uuid }) {
     return new Promise((resolve, reject) => {
-      console.log(user)
       jwt.sign({
         id: user._id,
         email: user.email,

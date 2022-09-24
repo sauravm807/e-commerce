@@ -28,10 +28,9 @@ export class AuthGuard implements CanActivate {
           return true;
         }),
         catchError(() => {
+          const refreshToken = this.authService.getRefreshToken();
+          if(!refreshToken) return this.router.navigate(['/login']);
           this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-          // this.toastr.info("Please login first.");
-          // localStorage.removeItem("accessToken");
-          // localStorage.removeItem("refreshToken");
           return of(false);
         })
       );

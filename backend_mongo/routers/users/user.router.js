@@ -12,7 +12,7 @@ userRouter.post("/register/multiple/random/:no", authController.registerMultiple
 
 userRouter.post("/login", authController.userLogin);
 
-userRouter.get("/get/tokens", authenticateRefreshToken, authController.generateTokens);
+userRouter.post("/get/tokens", authenticateRefreshToken, authController.generateTokens);
 
 userRouter.use(authenticateAccessToken);
 

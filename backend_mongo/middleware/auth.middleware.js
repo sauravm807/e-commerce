@@ -36,12 +36,12 @@ module.exports = {
 
     authenticateRefreshToken: async function (req, res, next) {
         try {
-            let tokenFromReq = req.body.token || req.query.token || req.headers['x-access-token'];
-            if (req.headers['authorization']) {
-                const authHeader = req.headers['authorization'];
-                if (!authHeader) throw createError.Unauthorized("Access Denied token required");
-                tokenFromReq = authHeader.split(" ")[1];
-            }
+            let tokenFromReq = req.body.token;
+            // if (req.headers['authorization']) {
+            //     const authHeader = req.headers['authorization'];
+            //     if (!authHeader) throw createError.Unauthorized("Access Denied token required");
+            //     tokenFromReq = authHeader.split(" ")[1];
+            // }
 
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 

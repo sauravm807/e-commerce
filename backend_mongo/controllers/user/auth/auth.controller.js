@@ -132,6 +132,10 @@ class AuthController {
 
             const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
 
+            const CREATED_AT = new Date().getTime();
+            
+            const EXPIRES_AT = CREATED_AT + (24 * 60 * 60 * 1000);
+
             const ifUuidExist = await Uuid.findOne({ userId: user._id });
             if (!ifUuidExist) {
                 const uuidCreate = new Uuid({
@@ -139,7 +143,8 @@ class AuthController {
                     uuid: [{
                         _id: uuid,
                         token: accessToken,
-                        createdAt: new Date().getTime()
+                        createdAt: CREATED_AT,
+                        expiresAt: EXPIRES_AT 
                     }]
                 });
 
@@ -157,11 +162,10 @@ class AuthController {
             }
 
             const arr = ifUuidExist.uuid;
-            arr.push({ _id: uuid, token: accessToken, createdAt: new Date().getTime() });
+            arr.push({ _id: uuid, token: accessToken, createdAt: CREATED_AT, expiresAt: EXPIRES_AT });
             const updateUuid = await Uuid.updateOne({ _id: ifUuidExist._id }, {
                 $set: {
                     uuid: arr,
-
                 }
             });
             if (updateUuid) return res.status(200).json({
@@ -232,7 +236,17 @@ class AuthController {
 
             const uuid = createUuid();
 
-            user.uuid.push({ _id: uuid, createdAt: new Date().getTime() });
+            const userData = await User.findOne({ _id: user.userId });
+
+            const accessToken = await createAccessToken({ user: userData, uuid: uuid });
+
+            const refreshToken = await createRefreshToken(uuid);
+
+            const CREATED_AT = new Date().getTime();
+            
+            const EXPIRES_AT = CREATED_AT + (24 * 60 * 60 * 1000);
+
+            user.uuid.push({ _id: uuid, token: accessToken, createdAt: CREATED_AT, expiresAt: EXPIRES_AT });
 
             const updateUuid = await Uuid.updateOne({ _id: user._id }, {
                 $set: {
@@ -240,12 +254,6 @@ class AuthController {
                 }
             });
 
-            const userData = await User.findOne({ _id: user.userId });
-            
-            const accessToken = await createAccessToken({ user: userData, uuid: uuid });
-
-            const refreshToken = await createRefreshToken(uuid);
-            
             res.status(200).json({
                 status: 200,
                 message: "Tokens generated successfully",
