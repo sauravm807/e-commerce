@@ -19,6 +19,8 @@ require("./connection/mongo.connection");
 
 require("./connection/redis.connection");
 
+require("./services/cronJobs/cron.init")();
+
 app.use(cors());
 
 app.use(express.static('public'));

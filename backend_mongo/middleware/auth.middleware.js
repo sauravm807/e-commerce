@@ -25,17 +25,7 @@ module.exports = {
 
             const payload = await verifyAccessToken(tokenFromReq);
 
-            if (!payload) throw createError.NotFound("Invalid token Access Denied");
-
-            const user = await User.findOne({ _id: payload.id });
-
-            payload["email"] = user.email;
-            payload["fullName"] = user.fullName;
-            payload["firstName"] = user.firstName;
-            payload["lastName"] = user.lastName;
-            payload["address"] = user.address;
-            payload["phoneNo"] = user.phoneNo;
-            payload["proPic"] = user.proPic;
+            if (!payload) throw createError.Unauthorized("Invalid token Access Denied");
 
             req.user = payload;
             next();
@@ -46,12 +36,12 @@ module.exports = {
 
     authenticateRefreshToken: async function (req, res, next) {
         try {
-            let tokenFromReq = req.body.token || req.query.token || req.headers['x-access-token'];
-            if (req.headers['authorization']) {
-                const authHeader = req.headers['authorization'];
-                if (!authHeader) throw createError.Unauthorized("Access Denied token required");
-                tokenFromReq = authHeader.split(" ")[1];
-            }
+            let tokenFromReq = req.body.token;
+            // if (req.headers['authorization']) {
+            //     const authHeader = req.headers['authorization'];
+            //     if (!authHeader) throw createError.Unauthorized("Access Denied token required");
+            //     tokenFromReq = authHeader.split(" ")[1];
+            // }
 
             if (tokenFromReq == null) throw createError.NotFound("Access Denied");
 

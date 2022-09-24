@@ -20,7 +20,6 @@ module.exports = {
     getTtl: function (id) {
         return new Promise(async (resolve, reject) => {
             const result = await client.TTL(id.toString());
-            console.log(result)
             resolve(result);
         });
     },

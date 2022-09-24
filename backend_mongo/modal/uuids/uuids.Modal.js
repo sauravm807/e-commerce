@@ -15,6 +15,9 @@ const UuidSchema = new Schema({
         token: String,
         createdAt: {
             type: Number
+        },
+        expiresAt : {
+            type: Number
         }
     }]
 });

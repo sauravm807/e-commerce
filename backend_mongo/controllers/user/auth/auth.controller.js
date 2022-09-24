@@ -72,7 +72,7 @@ class AuthController {
                 const password = await encryptPassword(email);
                 users.push({ email, password, fullName, firstName, lastName, phoneNo, address, createdAt });
             }
-            
+
             const insertedData = await User.insertMany(users);
 
             if (!insertedData.length) throw createError.BadRequest("Users not created.");
@@ -128,9 +128,13 @@ class AuthController {
             }
 
             const uuid = createUuid();
-            const accessToken = await createAccessToken({ userId: user._id, uuid }); // create access token with payload id and uuid
+            const accessToken = await createAccessToken({ user: user, uuid }); // create access token with payload id and uuid
 
             const refreshToken = await createRefreshToken(uuid); // create refresh token with payload uuid
+
+            const CREATED_AT = new Date().getTime();
+            
+            const EXPIRES_AT = CREATED_AT + (24 * 60 * 60 * 1000);
 
             const ifUuidExist = await Uuid.findOne({ userId: user._id });
             if (!ifUuidExist) {
@@ -139,7 +143,8 @@ class AuthController {
                     uuid: [{
                         _id: uuid,
                         token: accessToken,
-                        createdAt: new Date().getTime()
+                        createdAt: CREATED_AT,
+                        expiresAt: EXPIRES_AT 
                     }]
                 });
 
@@ -157,11 +162,10 @@ class AuthController {
             }
 
             const arr = ifUuidExist.uuid;
-            arr.push({ _id: uuid, token: accessToken, createdAt: new Date().getTime() });
+            arr.push({ _id: uuid, token: accessToken, createdAt: CREATED_AT, expiresAt: EXPIRES_AT });
             const updateUuid = await Uuid.updateOne({ _id: ifUuidExist._id }, {
                 $set: {
                     uuid: arr,
-
                 }
             });
             if (updateUuid) return res.status(200).json({
@@ -216,7 +220,6 @@ class AuthController {
     async generateTokens(req, res, next) {
         try {
             const { id } = req.userRefresh;
-
             const user = await Uuid.findOne({
                 uuid: {
                     $elemMatch: {
@@ -233,17 +236,23 @@ class AuthController {
 
             const uuid = createUuid();
 
-            user.uuid.push({ _id: uuid, createdAt: new Date().getTime() });
+            const userData = await User.findOne({ _id: user.userId });
+
+            const accessToken = await createAccessToken({ user: userData, uuid: uuid });
+
+            const refreshToken = await createRefreshToken(uuid);
+
+            const CREATED_AT = new Date().getTime();
+            
+            const EXPIRES_AT = CREATED_AT + (24 * 60 * 60 * 1000);
+
+            user.uuid.push({ _id: uuid, token: accessToken, createdAt: CREATED_AT, expiresAt: EXPIRES_AT });
 
             const updateUuid = await Uuid.updateOne({ _id: user._id }, {
                 $set: {
                     uuid: user.uuid
                 }
             });
-
-            const accessToken = await createAccessToken({ userId: user._id, uuid: uuid });
-
-            const refreshToken = await createRefreshToken(uuid);
 
             res.status(200).json({
                 status: 200,
