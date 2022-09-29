@@ -1,9 +1,9 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
-    return sequelize.define("Uuid", {
+module.exports = function (sequelize, Sequelize) {
+    return sequelize.define("uuid", {
         userId: {
-            type: DataTypes.INTEGER(11),
+            type: Sequelize.INTEGER(11),
             allowNull: false,
             references: {
                 model: 'users',
@@ -12,21 +12,28 @@ module.exports = function (sequelize, DataTypes) {
             }
         },
         uuid: {
-            type: DataTypes.STRING(255),
+            type: Sequelize.STRING(255),
             primaryKey: true,
             unique: true,
             allowNull: false,
         },
         token: {
-            type: DataTypes.TEXT('long'),
+            type: Sequelize.TEXT('long'),
             allowNull: false,
         },
         refreshtoken_expires_time: {
-            type: DataTypes.INTEGER,
+            type: Sequelize.INTEGER,
             allowNull: false,
         },
-    },
-        {
-            timestamps: true
-        });
+        createdAt: {
+            type: 'TIMESTAMP',
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            allowNull: false
+        },
+        updatedAt: {
+            type: 'TIMESTAMP',
+            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+            allowNull: false
+        }
+    });
 };

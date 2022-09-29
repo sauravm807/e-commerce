@@ -3,9 +3,9 @@ const DataTypes = require("sequelize").DataTypes;
 const user = require("./user/User.modal");
 const uuid = require("./uuids/uuids.Modal");
 
-function initModels(sequelize) {
-    const userModal = user(sequelize, DataTypes);
-    const uuidModal = uuid(sequelize, DataTypes);
+function initModels(sequelize, Sequelize) {
+    const userModal = user(sequelize, Sequelize);
+    const uuidModal = uuid(sequelize, Sequelize);
 
     return { userModal, uuidModal };
 }

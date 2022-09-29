@@ -40,6 +40,7 @@ class AuthController {
             const { columns, values } = getColumnValues(userData);
             
             const insertQry = `INSERT INTO users ${columns} VALUES ${values}`;
+            console.log(insertQry)
             const insertData = await dbOperation.insert(insertQry);
             console.log("insertData==", insertData)
             if (!insertData) throw createError.BadRequest("User not created.");
