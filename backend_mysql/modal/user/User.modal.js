@@ -1,44 +1,53 @@
 "use strict";
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function (sequelize, Sequelize) {
   return sequelize.define("users", {
     id: {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: DataTypes.INTEGER(),
+      type: Sequelize.INTEGER(),
     },
     email: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       allowNull: false,
       unique: true
     },
     password: {
-      type: DataTypes.STRING,
+      type: Sequelize.STRING,
       // validate: {
       //     is: /^[0-9a-f]{64}$/i
       //   }
     },
     fullName: {
-      type: DataTypes.STRING
+      type: Sequelize.STRING
     },
     firstName: {
-      type: DataTypes.STRING
+      type: Sequelize.STRING
     },
     lastName: {
-      type: DataTypes.STRING
+      type: Sequelize.STRING
     },
     phoneNo: {
-      type: DataTypes.STRING
+      type: Sequelize.STRING
     },
     address: {
-      type: DataTypes.STRING
+      type: Sequelize.STRING
     },
     wrongPassCount: {
-      type: DataTypes.INTEGER,
+      type: Sequelize.INTEGER,
       allowNull: false,
       defaultValue: 0
+    },
+    createdAt: {
+      type: 'TIMESTAMP',
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      allowNull: false
+    },
+    updatedAt: {
+      type: 'TIMESTAMP',
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+      allowNull: false
     }
   });
 };
-

@@ -58,3 +58,6 @@ error: Sep-29-2022 17:07:35: 	409 - undefined - sauravvishal@globussoft.in is al
 error: Sep-29-2022 18:17:08: 	500 - undefined - Assignment to constant variable. - /api/user/register - POST - ::1
 error: Sep-29-2022 18:37:05: 	500 - undefined - getColumnValues is not a function - /api/user/register - POST - ::1
 error: Sep-29-2022 18:37:52: 	500 - undefined - getColumnValues is not a function - /api/user/register - POST - ::1
+error: Sep-29-2022 21:57:23: 	400 - undefined - User not created. - /api/user/register - POST - ::1
+error: Sep-29-2022 21:58:13: 	400 - undefined - User not created. - /api/user/register - POST - ::1
+error: Sep-29-2022 22:03:57: 	400 - undefined - User not created. - /api/user/register - POST - ::1
