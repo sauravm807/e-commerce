@@ -197,7 +197,7 @@ class AuthController {
             const { id, uuid } = req.user;
 
             const data = await Uuid.findOne({ userId: id });
-
+            if (!data) throw createError.NotFound("Token not in DB.");
             const index = data.uuid.findIndex(item => item._id === uuid);
 
             const arr = data.uuid.splice(index, 1);

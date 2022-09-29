@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
 import { Observable, map, catchError, of } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import {Location} from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +9,7 @@ import {Location} from '@angular/common';
 export class LoginGuard implements CanActivate {
   constructor(
     private router: Router,
-    private authService: AuthService,
-    private location: Location
+    private authService: AuthService
   ) { }
   canActivate(
     route: ActivatedRouteSnapshot,

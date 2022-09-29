@@ -5,29 +5,16 @@ const {
     faker
 } = require('@faker-js/faker');
 
-// modals imports
-const User = require("../../../modal/user/User.modal");
-const Uuid = require("../../../modal/uuids/uuids.Modal");
+const dbOperation = require("../../../connection/sql.connection");
 
 // services imports
 const redisService = require("../../../services/redis.service");
-const {
-    userValidateSchemaRegister,
-    userValidateSchemaLogin,
-    userValidateSchemachangePassword
-} = require("../../../validation/user.validation");
-const {
-    encryptPassword,
-    matchPassword
-} = require("../../../services/bcrypt.service");
-const {
-    createUuid
-} = require("../../../services/uuid.service");
-const {
-    createAccessToken,
-    createRefreshToken,
-} = require("../../../services/jwt.service");
-const sendSMS = require('../../../services/sms.service')
+const { userValidateSchemaRegister, userValidateSchemaLogin, userValidateSchemachangePassword } = require("../../../validation/user.validation");
+const { encryptPassword, matchPassword } = require("../../../services/bcrypt.service");
+const { createUuid } = require("../../../services/uuid.service");
+const { createAccessToken, createRefreshToken, } = require("../../../services/jwt.service");
+const sendSMS = require('../../../services/sms.service');
+const { getColumnValues } = require("../../../services/utility.service");
 
 class AuthController {
     /**
@@ -40,20 +27,22 @@ class AuthController {
      */
     async registerOneUser(req, res, next) {
         try {
-            console.log(req.body);
             const userData = await userValidateSchemaRegister.validateAsync(req.body);
-            const ifUserExist = await User.findOne({
-                where: {
-                    email: req.body.email
-                }
-            });
-            if (ifUserExist) throw createError.Conflict(`${userData.email} is already present.`);
+
+            const query = `SELECT id FROM users WHERE email = "${userData.email}"`;
+            const ifUserExist = await dbOperation.select(query);
+            if (ifUserExist.length) throw createError.Conflict(`${userData.email} is already present.`);
+
             const password = await encryptPassword(userData.password);
             userData.password = password;
             delete userData.repeatPassword;
-            const user = await User.create(userData);
-            // const insertUser = await user.save();
-            if (!user) throw createError.BadRequest("User not created.");
+            
+            const { columns, values } = getColumnValues(userData);
+            
+            const insertQry = `INSERT INTO users ${columns} VALUES ${values}`;
+            const insertData = await dbOperation.insert(insertQry);
+            console.log("insertData==", insertData)
+            if (!insertData) throw createError.BadRequest("User not created.");
             res.status(201).json({
                 status: 201,
                 message: "New user created."
@@ -113,6 +102,8 @@ class AuthController {
         }
     }
 
+
+
     /**
      * userLogin - login user
      * @param {*} req 
@@ -123,11 +114,12 @@ class AuthController {
     async userLogin(req, res, next) {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
-            const user = await User.findOne({
-                where: {
-                    email: userData.email
-                }
-            });
+            const user = await sequelize.query(`SELECT * FROM users WHERE email = '${userData.email}'`)
+            // const user = await User.findOne({
+            //     where: {
+            //         email: userData.email
+            //     }
+            // });
 
             if (!user) throw createError.NotFound("Email not found.");
 
@@ -326,7 +318,7 @@ class AuthController {
                 email,
                 number
             } = req.body;
-            if(!email && !number) throw createError.BadRequest("Email and Number is required.");
+            if (!email && !number) throw createError.BadRequest("Email and Number is required.");
 
             let verifyuser = await User.findOne({
                 where: {
@@ -372,7 +364,7 @@ class AuthController {
                 otp
             } = req.body;
 
-            if(!otp) throw createError.BadRequest("OTP is required.");
+            if (!otp) throw createError.BadRequest("OTP is required.");
 
             let verifyotp = await redisService.getVerificationOtp(otp.toString());
             if (verifyotp) return res.status(200).json({
@@ -393,7 +385,7 @@ class AuthController {
             const {
                 email
             } = req.query;
-            if(!email) throw createError.BadRequest("Email is required.");
+            if (!email) throw createError.BadRequest("Email is required.");
             let verifyuser = await User.findOne({
                 where: {
                     email: email
@@ -421,7 +413,7 @@ class AuthController {
         }
     }
 
-   async changePasword(req, res, next) {
+    async changePasword(req, res, next) {
         try {
             const user = await userValidateSchemachangePassword.validateAsync(req.body);
             let verifyuser = await User.findOne({
@@ -434,7 +426,7 @@ class AuthController {
             const password = await encryptPassword(user.password);
             user.password = password;
             let updatePassword = await User.update({
-                password:  user.password
+                password: user.password
             }, {
                 where: {
                     email: user.email
