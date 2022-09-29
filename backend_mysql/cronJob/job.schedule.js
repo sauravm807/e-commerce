@@ -45,18 +45,6 @@ const jobSchedule = async () => {
         }
 
     })
-
-    cron.schedule(EVERY_30_SECONDS, async () => {
-        try {
-            console.log('cron started 2 ');
-
-        } catch (error) {
-            logger.error(`${error.status || 500} - ${error.message} - 'error in deleting'`);
-        }
-
-    })
-
-
 }
 
 jobSchedule()

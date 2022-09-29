@@ -81,11 +81,11 @@ class UserController {
             if (!searchText) throw createError.NotFound("Search Item is required.");
             const data = await User.find({
                 $or: [
-                    { email: { $regex: '.*' + searchText + '.*' } },
-                    { fullName: { $regex: '.*' + searchText + '.*' } },
-                    { firstName: { $regex: '.*' + searchText + '.*' } },
-                    { lastName: { $regex: '.*' + searchText + '.*' } },
-                    { phoneNo: { $regex: '.*' + searchText + '.*' } },
+                    { email: { $regex: '.*' + "saurav" + '.*' } },
+                    { fullName: { $regex: '.*' + "saurav" + '.*' } },
+                    { firstName: { $regex: '.*' + "saurav" + '.*' } },
+                    { lastName: { $regex: '.*' + "saurav" + '.*' } },
+                    { phoneNo: { $regex: '.*' + "saurav" + '.*' } },
                 ]
             });
 
@@ -107,6 +107,22 @@ class UserController {
                 status: 200,
                 message: "User fetched successfully",
                 data: data
+            });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async getUsers(req, res) {
+        try {
+            const { id } = req.user;
+            console.log(id)
+            const users = await User.find({ _id: { $ne: id } }).limit(10);;
+            if (!users.length) throw createError.NotFound("No user found.");
+            res.status(200).json({
+                status: 200,
+                message: "User fetched successfully",
+                data: users
             })
         } catch (error) {
             next(error);

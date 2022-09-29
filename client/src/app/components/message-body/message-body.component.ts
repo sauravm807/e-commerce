@@ -17,6 +17,7 @@ export class MessageBodyComponent implements OnInit {
   showInput: boolean = true;
   userData: any = {};
   basePath: string = "";
+  usersList: any = [];
 
   constructor(
     private socketService: SocketioService,
@@ -31,6 +32,17 @@ export class MessageBodyComponent implements OnInit {
     this.authService.userDataMessage.subscribe(res => {
       this.userData = res;
     });
+
+    this.userService.getUserDetails().subscribe({
+      next: res => {
+        this.usersList = res.data;
+        console.log(this.usersList);
+      },
+      error: err => {
+        this.usersList = [];
+      }
+    });
+
     this.socketService.setupSocketConnection();
   }
 
@@ -49,13 +61,18 @@ export class MessageBodyComponent implements OnInit {
     this.authService.userLogout()
       .subscribe({
         next: (res: any) => {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+          this.authService.removeTokens();
           this.toastr.success(res.message);
           this.router.navigate(["login"]);
         },
         error: err => {
-          this.toastr.error("Something went wrong.");
+          if (err.error.error.status === 404) {
+            this.authService.removeTokens();
+            this.toastr.success("Logged out successfully.");
+            this.router.navigate(["login"]);
+          } else {
+            this.toastr.error("Something went wrong.");
+          }
         }
       });
   }

@@ -48,3 +48,13 @@ error: Sep-22-2022 22:31:04: 	500 - undefined - Out of range value for column 'p
 error: Sep-22-2022 22:32:14: 	500 - undefined - Out of range value for column 'phoneNo' at row 1 - /api/user/register - POST - ::1
 error: Sep-22-2022 22:40:34: 	500 - undefined - undefined - /api/user/login - POST - ::1
 error: Sep-22-2022 22:40:39: 	500 - undefined - undefined - /api/user/login - POST - ::1
+error: Sep-29-2022 16:21:11: 	405 - undefined - "email" is required - /api/user/register - POST - ::1
+error: Sep-29-2022 16:21:29: 	500 - undefined - sequelize.query is not a function - /api/user/register - POST - ::1
+error: Sep-29-2022 16:22:25: 	500 - undefined - sequelize.query is not a function - /api/user/register - POST - ::1
+error: Sep-29-2022 16:23:34: 	500 - undefined - User.query is not a function - /api/user/register - POST - ::1
+error: Sep-29-2022 16:43:15: 	409 - undefined - sauravvishal@globussoft.in is already present. - /api/user/register - POST - ::1
+error: Sep-29-2022 16:43:45: 	409 - undefined - sauravvishal@globussoft.in is already present. - /api/user/register - POST - ::1
+error: Sep-29-2022 17:07:35: 	409 - undefined - sauravvishal@globussoft.in is already present. - /api/user/register - POST - ::1
+error: Sep-29-2022 18:17:08: 	500 - undefined - Assignment to constant variable. - /api/user/register - POST - ::1
+error: Sep-29-2022 18:37:05: 	500 - undefined - getColumnValues is not a function - /api/user/register - POST - ::1
+error: Sep-29-2022 18:37:52: 	500 - undefined - getColumnValues is not a function - /api/user/register - POST - ::1

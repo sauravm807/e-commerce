@@ -1,43 +1,32 @@
-"use strict;"
-const {sequelize,Sequelize} = require("../../connection/sql.connection");
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+"use strict";
 
-/**
- * UuidModel - UuidSchema
- * @author Sibasish Das <sibasishdas@globussoft.in>
- */
-
-    const UuidSchema = sequelize.define("Uuid", {
+module.exports = function (sequelize, DataTypes) {
+    return sequelize.define("Uuid", {
         userId: {
-        type: Sequelize.INTEGER(11),
-        allowNull: false,
-        references : {
-            model : 'users',
-            key : 'id'
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            references: {
+                model: 'users',
+                key: 'id'
 
-        }
-      },
-      uuid: {
-        type : Sequelize.STRING(255),
-        primaryKey: true,
-        unique : true,
-        allowNull: false,
+            }
+        },
+        uuid: {
+            type: DataTypes.STRING(255),
+            primaryKey: true,
+            unique: true,
+            allowNull: false,
+        },
+        token: {
+            type: DataTypes.TEXT('long'),
+            allowNull: false,
+        },
+        refreshtoken_expires_time: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
     },
-    token : {
-        type : Sequelize.TEXT('long'),
-        allowNull: false,
-
-    },
-    refreshtoken_expires_time : {
-        type :  Sequelize.INTEGER,
-        allowNull: false,
-
-    },
-    },
-    {
-        timestamps: true
-      
-    });
-module.exports = UuidSchema;
+        {
+            timestamps: true
+        });
+};
