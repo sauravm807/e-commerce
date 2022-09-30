@@ -2,12 +2,16 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = {
-  createAccessToken: function ({ userId, uuid }) {
+  createAccessToken: function ({ user, uuid }) {
     return new Promise((resolve, reject) => {
       jwt.sign({
-        id: userId,
+        id: user.id,
+        email: user.email,
+        fullName: user.fullName,
+        firstName: user.firstName,
+        lastName: user.lastName,
         uuid: uuid
-      }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: 60 * 60 }, function (err, token) {
+      }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: 1 * 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");
         resolve(token);
       });
@@ -23,10 +27,10 @@ module.exports = {
     });
   },
 
-  createRefreshToken: function (userId,uuid) {
+  createRefreshToken: function ({ userId, uuid }) {
     return new Promise((resolve, reject) => {
       jwt.sign({
-        userId : userId,
+        userId: userId,
         id: uuid
       }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: 1 * 24 * 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");

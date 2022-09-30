@@ -14,7 +14,8 @@ import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  URL: string = environment.DEV_URL_MONGO;
+  // URL: string = environment.DEV_URL_MONGO;
+  URL: string = environment.DEV_URL_MYSQL;
   constructor(private authService: AuthService, private http: HttpClient, private router: Router) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -36,6 +37,7 @@ export class AuthInterceptor implements HttpInterceptor {
                   }));
                 }),
                 catchError((err: HttpErrorResponse) => {
+                  console.log("RefreshTokenError======")
                   this.authService.removeTokens();
                   this.router.navigate(['/login']);
                   return throwError(() => err);

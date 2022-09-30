@@ -18,7 +18,7 @@ export class SocketioService {
   }
 
   setupSocketConnection() {
-    this.socket = io(environment.SOCKET_ENDPOINT);
+    this.socket = io(environment.SOCKET_ENDPOINT_MYSQL);
     this.socket.emit('my message', this.userId);
     this.socket.on("connect", () => {
       console.log(this.socket.id)

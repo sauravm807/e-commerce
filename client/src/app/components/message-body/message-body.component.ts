@@ -28,7 +28,7 @@ export class MessageBodyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.basePath = this.authService.BASEURL + "/assets/profile_pics/";
+    this.basePath = this.authService.BASEURL + "/assets/profile_pics";
     this.authService.userDataMessage.subscribe(res => {
       this.userData = res;
     });
@@ -43,7 +43,7 @@ export class MessageBodyComponent implements OnInit {
       }
     });
 
-    this.socketService.setupSocketConnection();
+    // this.socketService.setupSocketConnection();
   }
 
   ngOnDestroy() {

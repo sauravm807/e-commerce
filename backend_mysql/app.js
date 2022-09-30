@@ -5,6 +5,8 @@ const app = express();
 
 const createError = require('http-errors');
 
+const cors = require('cors')
+
 const morgan = require('morgan');
 
 require('dotenv').config()
@@ -20,11 +22,15 @@ const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
 
+app.use(cors())
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
 app.use(morgan('dev'));
+
+app.use(express.static('public'));
 
 /**
  * to generate secret key for tokens
@@ -47,7 +53,6 @@ app.use("/api", router);
 
 app.use((req, res, next) => {
     next(createError(404, "Not Found"));
-    
 });
 
 /**

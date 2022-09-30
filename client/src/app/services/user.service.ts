@@ -9,8 +9,10 @@ import { Router } from '@angular/router';
 })
 export class UserService {
 
-  URL: string = environment.DEV_URL_MONGO;
-  BASE_URL: string = environment.DEV_BASEURL_MONGO;
+  // URL: string = environment.DEV_URL_MONGO;
+  // BASE_URL: string = environment.DEV_BASEURL_MONGO;
+  URL: string = environment.DEV_URL_MYSQL;
+  BASE_URL: string = environment.DEV_BASEURL_MYSQL;
 
   constructor(private http: HttpClient, private router: Router) { }
 

@@ -12,7 +12,7 @@ userRouter.post("/register/multiple/random/:no", authController.registerMultiple
 
 userRouter.post("/login", authController.userLogin);
 
-userRouter.get("/get/tokens", authenticateRefreshToken, authController.generateTokens);
+userRouter.post("/get/tokens", authenticateRefreshToken, authController.generateTokens);
 
 userRouter.post("/forgetpassword", authController.forgetPassword);
 
@@ -28,6 +28,12 @@ userRouter.delete("/logout", deleteToken, authController.userLogout);
 
 userRouter.delete("/logout/all-tokens", authController.userLogoutAllTokens);
 
-userRouter.get("/get/userData", userController.getUserData);
+userRouter.get("/me", userController.getUserData);
+
+userRouter.post("/upload/propic", userController.uploadProfilePic);
+
+userRouter.post("/search", userController.searchUser);
+
+userRouter.get("/friends", userController.getUsers);
 
 module.exports = userRouter;
