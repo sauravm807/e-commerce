@@ -16,12 +16,13 @@ class UserController {
     async getUserData(req, res, next) {
         try {
             if (!req.user) throw createError.NotFound("Access token required");
+
             const { id, email, fullName, firstName, lastName } = req.user;
-            // console.log("req.user======", req.user)
+
             const query = `SELECT address, proPic, phoneNo FROM users WHERE id = ${id};`;
-            
+
             const [userData] = await dbOperation.select(query);
-            // console.log("userData=====", userData)
+
             res.status(200).json({
                 status: 200,
                 data: {
@@ -60,7 +61,7 @@ class UserController {
             const [picData] = await dbOperation.select(query);
 
             query = `UPDATE users SET proPic = "${isUploadImagePath}" WHERE id = ${id};`;
-            
+
             const updateData = await dbOperation.update(query);
             if (updateData[1] > 0) {
                 if (picData?.proPic) await removePic(picData.proPic);
@@ -85,9 +86,23 @@ class UserController {
     */
     async searchUser(req, res, next) {
         try {
-            const { searchText } = req.body;
+            const { id } = req.user;
+            let { searchText } = req.body;
+            searchText = searchText?.trim();
             if (!searchText) throw createError.NotFound("Search Item is required.");
 
+            const query = `SELECT id, fullName, proPic, email 
+                    FROM users WHERE (fullName like "%${searchText}%" OR phoneNo LIKE "%${searchText}%") 
+                    AND id <> ${id} ORDER BY email;`;
+            const searchedData = await dbOperation.select(query);
+
+            if (!searchedData.length) throw createError.NotFound("No user found.");
+
+            res.status(200).json({
+                status: 200,
+                message: "Users found successfully",
+                data: searchedData
+            })
         } catch (error) {
             next(error);
         }
@@ -96,14 +111,11 @@ class UserController {
     async getUsers(req, res, next) {
         try {
             const { id } = req.user;
-            
-            let query = `SELECT id, fullName, proPic FROM users WHERE id != ${id} LIMIT 10;`;
+
+            let query = `SELECT id, fullName, proPic FROM users WHERE id <> ${id} LIMIT 10;`;
             const data = await dbOperation.select(query);
 
-            if(!data.length) throw createError.NotFound({
-                status: 404,
-                message: "No users found."
-            });
+            if (!data.length) throw createError.NotFound("No users found.");
 
             res.status(200).json({
                 status: 200,

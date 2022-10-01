@@ -35,4 +35,8 @@ export class UserService {
     return this.http.get(`${this.URL}/user/friends`);
   }
 
+  searchUserList(text: string): Observable<any> {
+    return this.http.post(`${this.URL}/user/search`, { searchText: text });
+  }
+
 }
