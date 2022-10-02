@@ -1,9 +1,7 @@
 "use strict;"
 //pakages imports
 const createError = require('http-errors');
-const {
-    faker
-} = require('@faker-js/faker');
+const { faker } = require('@faker-js/faker');
 
 const dbOperation = require("../../../connection/sql.connection");
 
@@ -31,18 +29,18 @@ class AuthController {
 
             const query = `SELECT id FROM users WHERE email = "${userData.email}"`;
             const ifUserExist = await dbOperation.select(query);
-            if (ifUserExist.length) throw createError.Conflict(`${userData.email} is already present.`);
+            if (ifUserExist?.length) throw createError.Conflict(`${userData.email} is already present.`);
 
             const password = await encryptPassword(userData.password);
             userData.password = password;
             delete userData.repeatPassword;
-            
+
             const { columns, values } = getColumnValues(userData);
-            
+
             const insertQry = `INSERT INTO users ${columns} VALUES ${values}`;
-            console.log(insertQry)
+
             const insertData = await dbOperation.insert(insertQry);
-            console.log("insertData==", insertData)
+
             if (!insertData) throw createError.BadRequest("User not created.");
             res.status(201).json({
                 status: 201,
@@ -65,34 +63,27 @@ class AuthController {
      */
     async registerMultipleRandomUser(req, res, next) {
         try {
-            const {
-                no
-            } = req.params;
+            const { no } = req.params;
             const users = [];
+            let str = "";
             for (let i = 0; i < no; i++) {
                 const fullName = faker.name.fullName();
                 const firstName = fullName.split(" ")[0];
                 const lastName = fullName.split(" ")[1];
                 const email = faker.internet.email(fullName).toLowerCase();
                 const phoneNo = faker.phone.number('+91##########');
-                const createdAt = faker.date.between('2021-01-01T00:00:00.000Z', '2022-06-06T00:00:00.000Z')
+                const createdAt = faker.date.between('2021-09-30 10:10:07', '2022-09-30 10:10:07').toISOString().slice(0, 19).replace('T', ' ');;
                 const address = `${faker.address.buildingNumber()} ${faker.address.cardinalDirection()} ${faker.address.city()} ${faker.address.state()}`;
                 const password = await encryptPassword(email);
-                users.push({
-                    email,
-                    password,
-                    fullName,
-                    firstName,
-                    lastName,
-                    phoneNo,
-                    address,
-                    createdAt
-                });
+                str += `("${email}", "${password}", "${fullName}", "${firstName}", "${lastName}", "${phoneNo}", "${address}", "${createdAt}", "${createdAt}"),`;
             }
 
-            const insertedData = await User.bulkCreate(users);
+            str = str.substring(0, str.length - 1);
+            let query = `INSERT INTO users (email, password , fullName , firstName , lastName , phoneNo , address, createdAt, updatedAt) VALUES ${str}`;
 
-            if (!insertedData.length) throw createError.BadRequest("Users not created.");
+            const insertData = await dbOperation.insert(query);
+
+            if (!insertData) throw createError.BadRequest("Users not created.");
 
             res.status(201).json({
                 status: 201,
@@ -102,7 +93,6 @@ class AuthController {
             next(error);
         }
     }
-
 
 
     /**
@@ -115,12 +105,10 @@ class AuthController {
     async userLogin(req, res, next) {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
-            const user = await sequelize.query(`SELECT * FROM users WHERE email = '${userData.email}'`)
-            // const user = await User.findOne({
-            //     where: {
-            //         email: userData.email
-            //     }
-            // });
+
+            const query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE email = "${userData.email}";`;
+
+            let [user] = await dbOperation.select(query);
 
             if (!user) throw createError.NotFound("Email not found.");
 
@@ -128,6 +116,7 @@ class AuthController {
                 password: userData.password,
                 hash: user.password
             });
+
             const msg = await redisService.getId(user.id);
             if (msg) {
                 const ttl = await redisService.getTtl(user.id);
@@ -137,51 +126,39 @@ class AuthController {
             if (!isMatch) {
                 let count = user.wrongPassCount;
                 if (count < 3) {
-                    await User.update({
-                        wrongPassCount: ++count
-                    }, {
-                        where: {
-                            id: user.id
-                        }
-                    });
-                    throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}`);
+                    const query = `UPDATE users SET wrongPassCount = ${++count} WHERE id = ${user.id};`;
+                    await dbOperation.update(query);
+                    throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}.`);
                 } else {
                     const result = await redisService.setId(user.id);
-                    await User.update({
-                        wrongPassCount: 0
-                    }, {
-                        where: {
-                            id: user.id
-                        }
-                    });
+                    const query = `UPDATE users SET wrongPassCount = 0 WHERE id = ${user.id};`;
+                    await dbOperation.update(query);
                     throw createError.BadRequest(`Login has been blocked try after one minute`);
                 }
             }
 
             const uuid = createUuid();
-            const accessToken = await createAccessToken({
-                userId: user.id,
-                uuid
-            }); // create access token with payload id and uuid
-            const refreshToken = await createRefreshToken(user.id, uuid); // create refresh token with payload uuid
-            const uuidCreate = await Uuid.create({
-                userId: user.id,
-                uuid: uuid,
-                token: accessToken,
-                refreshtoken_expires_time: Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
-            });
+            const accessToken = await createAccessToken({ user, uuid }); // create access token with payload id and uuid
 
-            if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
-            return res.status(200).json({
+            const refreshToken = await createRefreshToken({ userId: user.id, uuid }); // create refresh token with payload uuid
+
+            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
+
+            const insertQry = `INSERT INTO uuids (userId, uuid, token, refreshtoken_expires_time) VALUES (${user.id},"${uuid}","${accessToken}",${expiryTime});`;
+
+            const insertData = await dbOperation.insert(insertQry);
+
+            if (!insertData || insertData[1] <= 0) throw createError.BadRequest("Something went wrong.");
+
+            res.status(200).json({
                 status: 200,
                 message: "Login successfull",
-                token: {
-                    accessToken,
-                    refreshToken
+                data: {
+                    id: user.id,
+                    token: { accessToken, refreshToken }
                 }
             });
         } catch (error) {
-            console.log(error.message);
             if (error.isJoi) {
                 return next(createError.MethodNotAllowed(error.details[0].message));
             }
@@ -198,24 +175,16 @@ class AuthController {
      */
     async userLogout(req, res, next) {
         try {
-            const {
-                id,
-                uuid
-            } = req.user;
+            const { id, uuid } = req.user;
+            let query = `SELECT * FROM uuids WHERE uuid = "${uuid}";`;
 
-            const data = await Uuid.findAll({
-                where: {
-                    userId: id
-                }
-            });
+            const [tokenData] = await dbOperation.select(query);
 
-            const tokenData = data.filter(item => item.uuid === uuid);
             if (!tokenData) throw createError.NotFound("Token not found in db.");
-            const deleteUuid = await Uuid.destroy({
-                where: {
-                    uuid: uuid
-                }
-            });
+
+            query = `DELETE FROM uuids WHERE uuid = "${uuid}";`;
+            await dbOperation.delete(query);
+
             res.status(200).json({
                 code: 200,
                 message: "Logged out successfully."
@@ -227,41 +196,35 @@ class AuthController {
 
     async generateTokens(req, res, next) {
         try {
-            const {
-                userId,
-                id
-            } = req.userRefresh;
+            const { userId, id } = req.userRefresh;
 
-            const userData = await Uuid.findAll({
-                where: {
-                    uuid: id
-                }
-            });
-            if (!Object.keys(userData).length) throw createError.NotFound("Token not found in db.");
+            let query = `SELECT userId FROM uuids WHERE uuid = "${id}";`;
+
+            const [isuuidPres] = await dbOperation.select(query);
+
+            if (!isuuidPres) throw createError.NotFound("Token not found in db.");
+
+            query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE id = ${userId};`;
+
+            const [userData] = await dbOperation.select(query);
 
             const uuid = createUuid();
 
-            const accessToken = await createAccessToken({
-                userId: userId,
-                uuid: uuid
-            });
+            const accessToken = await createAccessToken({ user: userData, uuid: uuid });
 
-            const refreshToken = await createRefreshToken(userId, uuid);
+            const refreshToken = await createRefreshToken({ userId, uuid });
 
-            const uuidCreate = await Uuid.create({
-                userId: userId,
-                uuid: uuid,
-                token: accessToken,
-                refreshtoken_expires_time: Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
-            });
+            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60;
 
-            if (!uuidCreate) throw createError.BadRequest("Something went wrong.");
+            query = `INSERT INTO uuids (userId,uuid,token,refreshtoken_expires_time) VALUES (${userId},"${uuid}","${accessToken}",${expiryTime});`
 
-            const deleteUuid = await Uuid.destroy({
-                where: {
-                    uuid: id
-                }
-            });
+            const insertData = await dbOperation.insert(query);
+
+            if (!insertData || insertData[1] <= 0) throw createError.BadRequest("Something went wrong.");
+
+            query = `DELETE FROM uuids WHERE uuid = "${id}";`;
+
+            await dbOperation.delete(query);
 
             res.status(200).json({
                 status: 200,
@@ -271,7 +234,6 @@ class AuthController {
                     refreshToken
                 }
             });
-
         } catch (error) {
             next(error);
         }
@@ -279,29 +241,24 @@ class AuthController {
 
     async userLogoutAllTokens(req, res, next) {
         try {
-            const {
-                id,
-                uuid
-            } = req.user;
+            const { id } = req.user;
 
-            const data = await Uuid.findAll({
-                where: {
-                    userId: id
-                }
-            });
+            let query = `SELECT * FROM uuids WHERE userId = ${id};`;
+
+            const data = await dbOperation.select(query);
+
             const promises = [];
-
+            
             data.forEach(item => {
                 promises.push(redisService.setLoggedOutToken(item.token));
             });
 
             const result = await Promise.all(promises);
-            const deletedData = await Uuid.destroy({
-                where: {
-                    userId: id
-                }
-            });
+            
+            query = `DELETE FROM uuids WHERE userId = ${id};`;
 
+            await dbOperation.delete(query);
+            
             if (result.length) return res.status(200).json({
                 code: 200,
                 message: "User logged out from all devices"

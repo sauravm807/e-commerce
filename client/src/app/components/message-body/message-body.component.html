@@ -8,15 +8,25 @@
           accept=".png, .jpg, .jpeg" required ngModel #cngPic="ngModel">
       </div>
       <div class="mt-2 btn-div col-sm-10" style="margin-right: 0;">
-        <input type="text" class="search-input form-control" placeholder="Search here..." *ngIf="showInput">
+        <input type="text" class="form-control search-input" placeholder="Search here..." #search
+          (click)="onClickRemoveSearch()">
       </div>
     </div>
 
     <ng-container *ngIf="showMessages">
-      <div class="col-sm-8">
-        <img src="../../../assets/images/p2.jpg" alt="" class="profile-image rounded-circle">
-        <span class="ml-2">Rahul Kumar</span>
-        <div class="mt-2 btn-div">
+      <div class="col-sm-8" style="display: flex;">
+        <div class="col-sm-8">
+          <div class="cont" style="display: flex">
+            <img src="{{basePath}}/{{currentFriend.proPic}}" alt="" class="profile-image rounded-circle"
+              (error)="onImgError($event)">
+            <div style="display:flex; flex-direction: column;">
+              <span class="ml-5"><b>{{currentFriend.fullName}}</b></span>
+              <span class="last-seen">Last seen 10 hours ago</span>
+
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 col-sm-4 btn-div">
           <button class="logout-btn left-btn" (click)="onLogout()">Logout</button>
           <button class="logout-btn" (click)="onLogoutAllDevices()">Logout from all devices</button>
         </div>
@@ -28,87 +38,31 @@
       <div class="contact-table-scroll">
         <table class="table table-hover">
           <tbody>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p2.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Rahul Kumar <br> <small>achi chal rahi</small></td>
-              <td><small>11:55 PM</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Jack <br> <small>Bye tata</small></td>
-              <td><small>10:09 PM</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p4.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Bullywood Mafia <br> <small>Drg Drg Drg</small></td>
-              <td><small>Monday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Sumit Jha<br> <small>Corona ho gaya kya</small></td>
-              <td><small>9/22/20</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p6.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>News Channel <br> <small>Bekar news only</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Ali <br> <small>Hello</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p5.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Afreen <br> <small>Nahi main nahi janti</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Geeky Shows <br> <small>PPT nahi mila</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Sofia <br> <small>God Bless You</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
-            <tr class="chat-names-left" (click)="onShowMessage()">
-              <td><img src="../../../assets/images/p1.jpg" alt="" class="profile-image rounded-circle"></td>
-              <td>Kunal <br> <small>Nikl lo</small></td>
-              <td><small>Sunday</small></td>
-            </tr>
+            <ng-container *ngIf="usersList.length">
+              <ng-container>
+                <ng-container *ngFor="let user of usersList">
+                  <tr class="chat-names-left" (click)="onShowMessage(user)">
+                    <td>
+                      <img src="{{basePath}}/{{user.proPic}}" (error)="onImgError($event)" alt=""
+                        class="profile-image rounded-circle">
+                    </td>
+                    <td>
+                      <strong>{{user.fullName}}</strong><br>
+                      <small>{{ifSearchFriendList ? "@" + user.username :"achi chal rahi"}}</small>
+                    </td>
+                    <td [ngClass]="ifSearchFriendList ? 'd-hidden' : ''">
+                      <small>11:55 PM</small>
+                    </td>
+                  </tr>
+                </ng-container>
+              </ng-container>
+            </ng-container>
           </tbody>
         </table>
       </div>
 
     </div>
-    <div class="col-sm-8 message-area">
+    <div class="col-sm-8 message-area" *ngIf="showMessages">
       <div class="message-table-scroll">
         <ng-container *ngIf="showMessages">
           <table class="table">
@@ -211,6 +165,11 @@
             </button>
           </div>
         </ng-container>
+      </div>
+    </div>
+    <div class="hide-message col-sm-8" *ngIf="!showMessages">
+      <div>
+        <p class="msg-info">Select a chat to start messaging</p>
       </div>
     </div>
   </div>

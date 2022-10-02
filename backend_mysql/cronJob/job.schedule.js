@@ -1,6 +1,3 @@
-const {
-    func
-} = require('joi');
 const cron = require('node-cron');
 const logger = require('../error/logger');
 const {
@@ -10,7 +7,8 @@ const {
     EVERY_HOUR,
     EVERY_DAY
 } = require('./schedule.time');
-const Uuid = require("../modal/uuids/uuids.Modal");
+
+const dbOperation = require("../connection/sql.connection");
 
 
 /**
@@ -20,30 +18,27 @@ const Uuid = require("../modal/uuids/uuids.Modal");
 
 const jobSchedule = async () => {
 
-
     /**
      * job schedule for deleting token
      * @author Sibasish Das <sibasishdas@globussoft.in>
      */
 
-    cron.schedule(EVERY_DAY, async () => {
+    cron.schedule(EVERY_30_MINUTES, async () => {
         try {
-            console.log('cron started');
-            const data = await Uuid.findAll({});
-            data.forEach(async element => {
-                if (element.refreshtoken_expires_time < Math.round(new Date().getTime() / 1000)) {
-                    let deleteToken = await Uuid.destroy({
-                        where: {
-                            uuid: element.uuid
-                        }
-                    });
-                }
-
-            })
+            console.log("cron started========")
+            const data = await dbOperation.select("SELECT uuid, refreshtoken_expires_time FROM uuids;");
+            // if (data.length) {
+                data.forEach(async element => {
+                    console.log("element.refreshtoken_expires_time", element.refreshtoken_expires_time);
+                    console.log("cron time", Math.round(new Date().getTime() / 1000));
+                    if (element.refreshtoken_expires_time < Math.round(new Date().getTime() / 1000)) {
+                        await dbOperation.delete(`DELETE FROM uuids WHERE uuid = "${element.uuid}"`);
+                    }
+                });
+            // }
         } catch (error) {
             logger.error(`${error.status || 500} - ${error.message} - 'error in deleting'`);
         }
-
     })
 }
 

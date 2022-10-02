@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  SOCKET_ENDPOINT: 'http://localhost:3031',
+  SOCKET_ENDPOINT_MONGO: 'http://localhost:3031',
+  SOCKET_ENDPOINT_MYSQL: 'http://localhost:8088',
   DEV_URL_MONGO: 'http://localhost:3031/api',
   DEV_BASEURL_MONGO: 'http://localhost:3031',
   DEV_URL_MYSQL: 'http://localhost:8088/api',

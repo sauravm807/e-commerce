@@ -33,7 +33,7 @@ class UserController {
     }
 
     /**
-    * getUserData - to upload profile pic
+    * uploadProfilePic - to upload profile pic
     * @param {*} req 
     * @param {*} res 
     * @param {*} next 
@@ -116,8 +116,8 @@ class UserController {
     async getUsers(req, res) {
         try {
             const { id } = req.user;
-            console.log(id)
-            const users = await User.find({ _id: { $ne: id } }).limit(10);;
+            
+            const users = await User.find({ _id: { $ne: id } }).limit(10);
             if (!users.length) throw createError.NotFound("No user found.");
             res.status(200).json({
                 status: 200,

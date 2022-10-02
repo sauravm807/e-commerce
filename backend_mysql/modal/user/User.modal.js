@@ -28,6 +28,9 @@ module.exports = function (sequelize, Sequelize) {
     lastName: {
       type: Sequelize.STRING
     },
+    proPic: {
+      type: Sequelize.STRING
+    },
     phoneNo: {
       type: Sequelize.STRING
     },

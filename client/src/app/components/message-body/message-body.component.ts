@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { SocketioService } from 'src/app/services/socketio.service';
 import { UserService } from 'src/app/services/user.service';
@@ -13,11 +14,16 @@ declare var $: any;
 })
 export class MessageBodyComponent implements OnInit {
 
-  showMessages: boolean = true;
+  showMessages: boolean = false;
   showInput: boolean = true;
+  ifSearchFriendList: boolean = false;
   userData: any = {};
   basePath: string = "";
   usersList: any = [];
+  usersListCopy: any = [];
+  currentFriend: any = [];
+
+  @ViewChild('search') search: any;
 
   constructor(
     private socketService: SocketioService,
@@ -28,7 +34,8 @@ export class MessageBodyComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.basePath = this.authService.BASEURL + "/assets/profile_pics/";
+    this.basePath = this.authService.BASEURL + "/assets/profile_pics";
+
     this.authService.userDataMessage.subscribe(res => {
       this.userData = res;
     });
@@ -36,7 +43,7 @@ export class MessageBodyComponent implements OnInit {
     this.userService.getUserDetails().subscribe({
       next: res => {
         this.usersList = res.data;
-        console.log(this.usersList);
+        this.usersListCopy = this.usersList;
       },
       error: err => {
         this.usersList = [];
@@ -48,6 +55,40 @@ export class MessageBodyComponent implements OnInit {
 
   ngOnDestroy() {
     this.socketService.disconnect();
+  }
+
+  ngAfterViewInit() {
+    const searchTerm = fromEvent<any>(this.search.nativeElement, 'keyup').pipe(
+      map(event => event.target.value.trim()),
+      debounceTime(500),
+      distinctUntilChanged()
+    );
+    searchTerm.subscribe(res => {
+      if (res.trim()) {
+        this.userService.searchUserList(res)
+        .pipe(
+          map(val => {
+            val = val.data;
+            val.forEach((elem: any) => {
+              elem["username"] = elem.email.split("@")[0];
+            });
+            return val;
+          })
+        )
+        .subscribe({
+          next: res => {
+            this.ifSearchFriendList = true;
+            this.usersList = res;
+          },
+          error: err => {
+            this.usersList = []
+          }
+        });
+      } else {
+        this.ifSearchFriendList = false;
+        this.usersList = this.usersListCopy;
+      }
+    });
   }
 
   onShowInput() {
@@ -98,8 +139,9 @@ export class MessageBodyComponent implements OnInit {
   /**
    * onShowMessage - for showing messages section
    */
-  onShowMessage() {
+  onShowMessage(user: any) {
     this.showMessages = true;
+    this.currentFriend = user;
   }
 
   showFileUpload() {
@@ -143,7 +185,6 @@ export class MessageBodyComponent implements OnInit {
   onImgError(event: Event) {
     let imgLink = this.userService.handleImageError();
     (event.target as HTMLInputElement).src = imgLink;
-    this.userData["proPic"] = imgLink;
   }
 
   refreshUserData() {
@@ -151,5 +192,9 @@ export class MessageBodyComponent implements OnInit {
       this.authService.userData.next(res.data);
       return true;
     });
+  }
+
+  onClickRemoveSearch() {
+    $('.search-input').val('');
   }
 }

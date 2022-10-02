@@ -7,8 +7,10 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  URL: string = environment.DEV_URL_MONGO;
-  BASEURL: string = environment.DEV_BASEURL_MONGO;
+  // URL: string = environment.DEV_URL_MONGO;
+  // BASEURL: string = environment.DEV_BASEURL_MONGO;
+  URL: string = environment.DEV_URL_MYSQL;
+  BASEURL: string = environment.DEV_BASEURL_MYSQL;
   userData = new BehaviorSubject({});
   userDataMessage = this.userData.asObservable();
 

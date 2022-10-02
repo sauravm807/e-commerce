@@ -28,6 +28,11 @@
   height: 35px;
   width: 35px;
   cursor: pointer;
+  margin-right: 10px;
+}
+
+.last-seen {
+  font-size: 10px;
 }
 
 .search-input {
@@ -47,6 +52,22 @@
 .message-area {
   background-color: #e4e1de;
   /* min-height: 90vh; */
+}
+
+.d-hidden {
+  visibility: hidden;
+}
+
+.hide-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.msg-info {
+  background-color: #d9fdd3;
+  padding: 0 10px;
+  border-radius: 12px;
 }
 
 .message-table-scroll {

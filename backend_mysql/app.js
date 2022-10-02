@@ -5,6 +5,8 @@ const app = express();
 
 const createError = require('http-errors');
 
+const cors = require('cors')
+
 const morgan = require('morgan');
 
 require('dotenv').config()
@@ -20,11 +22,25 @@ const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
 
-app.use(express.json());
+app.use(cors())
 
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({
+    limit: "50mb",
+    type: 'application/json'
+}));
+
+app.use(express.urlencoded({
+    extended: true,
+    limit: "50mb"
+}));
 
 app.use(morgan('dev'));
+
+app.use(express.static('public'));
+
+const server = app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+
+require("./services/socket/socket.init")(server);
 
 /**
  * to generate secret key for tokens
@@ -47,14 +63,13 @@ app.use("/api", router);
 
 app.use((req, res, next) => {
     next(createError(404, "Not Found"));
-    
 });
 
 /**
  * error handler
  */
 app.use((err, req, res, next) => {
-    console.log(err)
+    // console.log(err)
     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.status(err.status || 500).json({
         error: {
@@ -63,5 +78,3 @@ app.use((err, req, res, next) => {
         }
     });
 });
-
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
