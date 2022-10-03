@@ -50,8 +50,9 @@
                       <strong>{{user.fullName}}</strong><br>
                       <small>{{ifSearchFriendList ? "@" + user.username :"achi chal rahi"}}</small>
                     </td>
-                    <td [ngClass]="ifSearchFriendList ? 'd-hidden' : ''">
-                      <small>11:55 PM</small>
+                    <!-- <td [ngClass]="ifSearchFriendList ? 'd-hidden' : ''"> -->
+                    <td>
+                      <small>{{user.isOnline ? "Online" : "Offline"}}</small>
                     </td>
                   </tr>
                 </ng-container>
@@ -69,21 +70,21 @@
             <tbody>
               <tr class="chat-names">
                 <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left ">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
                     Hello Rahul <span class="chat-time">11:20 PM</span>
                   </p>
                 </td>
               </tr>
               <tr class="chat-names">
                 <td class=sent-msg>
-                  <p class="p-2 mt-2 mr-5 shadow-sm text-white float-right ">
+                  <p class="p-2 mt-2 mr-5 shadow-sm text-white float-right">
                     Hello Sonam How are You <span class="chat-time">11:21 PM</span>
                   </p>
                 </td>
               </tr>
               <tr class="chat-names">
-                <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                <td class="sent-msg">
+                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
                     Main achi hu tum kaise ho Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum ab quis
                     quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam
                     repellendus

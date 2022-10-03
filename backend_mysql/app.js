@@ -34,7 +34,7 @@ app.use(express.urlencoded({
     limit: "50mb"
 }));
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(express.static('public'));
 

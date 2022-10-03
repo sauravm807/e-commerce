@@ -19,9 +19,10 @@ export class MessageBodyComponent implements OnInit {
   ifSearchFriendList: boolean = false;
   userData: any = {};
   basePath: string = "";
-  usersList: any = [];
-  usersListCopy: any = [];
+  usersList: Array<any> = [];
+  usersListCopy: Array<any> = [];
   currentFriend: any = [];
+  onlineUserArr: any = [];
 
   @ViewChild('search') search: any;
 
@@ -43,6 +44,7 @@ export class MessageBodyComponent implements OnInit {
     this.userService.getUserDetails().subscribe({
       next: res => {
         this.usersList = res.data;
+        // console.log(this.usersList);
         this.usersListCopy = this.usersList;
       },
       error: err => {
@@ -50,7 +52,21 @@ export class MessageBodyComponent implements OnInit {
       }
     });
 
+
+
     this.socketService.setupSocketConnection();
+    this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
+      this.onlineUserArr = usersArr;
+      this.usersList = this.usersList.map((elem: any) => {
+        if (usersArr.includes(elem?.id)) {
+          elem["isOnline"] = true;
+        } else {
+          elem["isOnline"] = false;
+        }
+        return elem;
+      });
+      console.log(this.usersList);
+    });
   }
 
   ngOnDestroy() {
@@ -79,6 +95,18 @@ export class MessageBodyComponent implements OnInit {
           next: res => {
             this.ifSearchFriendList = true;
             this.usersList = res;
+            this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
+              this.onlineUserArr = usersArr;
+              this.usersList = this.usersList.map((elem: any) => {
+                if (usersArr.includes(elem?.id)) {
+                  elem["isOnline"] = true;
+                } else {
+                  elem["isOnline"] = false;
+                }
+                return elem;
+              });
+              console.log(this.usersList);
+            });
           },
           error: err => {
             this.usersList = []
@@ -105,6 +133,7 @@ export class MessageBodyComponent implements OnInit {
           this.authService.removeTokens();
           this.toastr.success(res.message);
           this.router.navigate(["login"]);
+          this.socketService.disconnect();
         },
         error: err => {
           if (err.error.error.status === 404) {
@@ -125,6 +154,7 @@ export class MessageBodyComponent implements OnInit {
     this.authService.userLogoutAllDevices()
       .subscribe({
         next: (res: any) => {
+          this.socketService.logoutAll();
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           this.toastr.success(res.message);
