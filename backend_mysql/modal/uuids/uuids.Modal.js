@@ -2,7 +2,7 @@
 
 module.exports = function (sequelize, Sequelize) {
     return sequelize.define("uuid", {
-        userId: {
+        user_id: {
             type: Sequelize.INTEGER(11),
             allowNull: false,
             references: {
@@ -25,15 +25,13 @@ module.exports = function (sequelize, Sequelize) {
             type: Sequelize.INTEGER,
             allowNull: false,
         },
-        createdAt: {
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
-            allowNull: false
-        },
-        updatedAt: {
-            type: 'TIMESTAMP',
-            defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        created_at: {
+            type: Sequelize.INTEGER(11),
+            defaultValue: Sequelize.fn('NOW'),
             allowNull: false
         }
+    }, {
+        createdAt: "created_at",
+        updatedAt: false
     });
 };

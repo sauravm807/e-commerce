@@ -21,7 +21,9 @@
               (error)="onImgError($event)">
             <div style="display:flex; flex-direction: column;">
               <span class="ml-5"><b>{{currentFriend.fullName}}</b></span>
-              <span class="last-seen">Last seen 10 hours ago</span>
+              <span class="last-seen">
+                {{currentFriend.isOnline ? "Online" : "Last seen 10 hours ago"}}
+              </span>
 
             </div>
           </div>
@@ -52,7 +54,10 @@
                     </td>
                     <!-- <td [ngClass]="ifSearchFriendList ? 'd-hidden' : ''"> -->
                     <td>
-                      <small>{{user.isOnline ? "Online" : "Offline"}}</small>
+                      <!-- <small></small> -->
+                      <small [ngClass]="user.isOnline ? 'd-online' : ''">
+                        {{user.isOnline ? "●" : ""}}
+                      </small>
                     </td>
                   </tr>
                 </ng-container>

@@ -27,21 +27,47 @@ class AuthController {
         try {
             const userData = await userValidateSchemaRegister.validateAsync(req.body);
 
-            const query = `SELECT id FROM users WHERE email = "${userData.email}"`;
+            const query = `SELECT 
+                                u.email, um.phone_no 
+                            FROM users u INNER JOIN usermeta um ON u.id = um.user_id 
+                            WHERE email = "${userData.email}" OR phone_no = "${userData.phoneNo}";`;
             const ifUserExist = await dbOperation.select(query);
-            if (ifUserExist?.length) throw createError.Conflict(`${userData.email} is already present.`);
+            if (ifUserExist?.length) throw createError.Conflict(`Email or Phone Number is already present.`);
 
             const password = await encryptPassword(userData.password);
             userData.password = password;
             delete userData.repeatPassword;
 
-            const { columns, values } = getColumnValues(userData);
+            const user = {
+                email: userData.email,
+                password: userData.password,
+                created_at: Math.floor(new Date().getTime() / 1000),
+                updated_at: Math.floor(new Date().getTime() / 1000)
+            };
 
-            const insertQry = `INSERT INTO users ${columns} VALUES ${values}`;
+            const { columns, values } = getColumnValues(user);
 
-            const insertData = await dbOperation.insert(insertQry);
+            const query1 = `INSERT INTO users ${columns} VALUES ${values}`;
 
-            if (!insertData) throw createError.BadRequest("User not created.");
+            const insertUser = await dbOperation.insert(query1);
+
+            const userMeta = {
+                user_id: insertUser[0],
+                full_name: userData.fullName,
+                first_name: userData.firstName,
+                last_name: userData.lastName,
+                phone_no: userData.phoneNo,
+                address: userData.address,
+                created_at: Math.floor(new Date().getTime() / 1000),
+                updated_at: Math.floor(new Date().getTime() / 1000)
+            };
+
+            const userMetaValue = getColumnValues(userMeta);
+
+            const query2 = `INSERT INTO usermeta ${userMetaValue.columns} VALUES ${userMetaValue.values}`;
+
+            const insertUserMeta = await dbOperation.insert(query2);
+
             res.status(201).json({
                 status: 201,
                 message: "New user created."
@@ -65,25 +91,48 @@ class AuthController {
         try {
             const { no } = req.params;
             const users = [];
-            let str = "";
+            let userVal = "";
+            let userMetaVal = "";
             for (let i = 0; i < no; i++) {
                 const fullName = faker.name.fullName();
                 const firstName = fullName.split(" ")[0];
                 const lastName = fullName.split(" ")[1];
                 const email = faker.internet.email(fullName).toLowerCase();
                 const phoneNo = faker.phone.number('+91##########');
-                const createdAt = faker.date.between('2021-09-30 10:10:07', '2022-09-30 10:10:07').toISOString().slice(0, 19).replace('T', ' ');;
+                const createdAtStr = faker.date.between('2021-09-30 10:10:07', '2022-09-30 10:10:07').toISOString().slice(0, 19).replace('T', ' ');;
+                const createdAt = new Date(createdAtStr).getTime() / 1000
                 const address = `${faker.address.buildingNumber()} ${faker.address.cardinalDirection()} ${faker.address.city()} ${faker.address.state()}`;
                 const password = await encryptPassword(email);
-                str += `("${email}", "${password}", "${fullName}", "${firstName}", "${lastName}", "${phoneNo}", "${address}", "${createdAt}", "${createdAt}"),`;
+                const user = {
+                    email: email,
+                    password: password,
+                    created_at: createdAt,
+                    updated_at: createdAt
+                };
+
+                const { columns, values } = getColumnValues(user);
+
+                const query1 = `INSERT INTO users ${columns} VALUES ${values}`;
+
+                const insertUser = await dbOperation.insert(query1);
+
+                const userMeta = {
+                    user_id: insertUser[0],
+                    full_name: fullName,
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone_no: phoneNo,
+                    address: address,
+                    created_at: createdAt,
+                    updated_at: createdAt
+                };
+
+                const userMetaValue = getColumnValues(userMeta);
+
+                const query2 = `INSERT INTO usermeta ${userMetaValue.columns} VALUES ${userMetaValue.values}`;
+
+                const insertUserMeta = await dbOperation.insert(query2);
             }
-
-            str = str.substring(0, str.length - 1);
-            let query = `INSERT INTO users (email, password , fullName , firstName , lastName , phoneNo , address, createdAt, updatedAt) VALUES ${str}`;
-
-            const insertData = await dbOperation.insert(query);
-
-            if (!insertData) throw createError.BadRequest("Users not created.");
 
             res.status(201).json({
                 status: 201,
@@ -248,17 +297,17 @@ class AuthController {
             const data = await dbOperation.select(query);
 
             const promises = [];
-            
+
             data.forEach(item => {
                 promises.push(redisService.setLoggedOutToken(item.token));
             });
 
             const result = await Promise.all(promises);
-            
+
             query = `DELETE FROM uuids WHERE userId = ${id};`;
 
             await dbOperation.delete(query);
-            
+
             if (result.length) return res.status(200).json({
                 code: 200,
                 message: "User logged out from all devices"

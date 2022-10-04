@@ -10887,3 +10887,29 @@ error: Oct-03-2022 18:58:19: 	404 - undefined - Not Found - /assets/profile_pics
 error: Oct-03-2022 18:58:20: 	404 - undefined - Not Found - /assets/profile_pics/ - GET - ::1
 error: Oct-03-2022 18:58:40: 	404 - undefined - Not Found - /assets/profile_pics/ - GET - ::1
 error: Oct-03-2022 18:58:54: 	404 - undefined - Not Found - /assets/profile_pics/ - GET - ::1
+error: Oct-04-2022 10:08:20: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:08:20: 	404 - undefined - Not Found - /assets/profile_pics/ - GET - ::1
+error: Oct-04-2022 10:08:31: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:09:02: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:09:34: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:13:47: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:35:34: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::ffff:127.0.0.1
+error: Oct-04-2022 10:35:34: 	404 - undefined - Token not found in db. - /api/user/get/tokens - POST - ::ffff:127.0.0.1
+error: Oct-04-2022 10:35:34: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::ffff:127.0.0.1
+error: Oct-04-2022 10:36:57: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 10:41:48: 	401 - undefined - NotFoundError: Invalid token Access Denied - /api/user/me - GET - ::1
+error: Oct-04-2022 13:00:37: 	500 - undefined - insertQry is not defined - /api/user/register - POST - ::1
+error: Oct-04-2022 13:01:01: 	500 - undefined - insertQry is not defined - /api/user/register - POST - ::1
+error: Oct-04-2022 13:02:42: 	409 - undefined - sauravvishal@globussoft.com is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:13:15: 	500 - undefined - Cannot read properties of null (reading '0') - /api/user/register - POST - ::1
+error: Oct-04-2022 13:14:10: 	500 - undefined - Cannot read properties of null (reading '0') - /api/user/register - POST - ::1
+error: Oct-04-2022 13:15:39: 	500 - undefined - Cannot read properties of null (reading '0') - /api/user/register - POST - ::1
+error: Oct-04-2022 13:23:42: 	500 - undefined - Cannot read properties of null (reading '0') - /api/user/register - POST - ::1
+error: Oct-04-2022 13:26:47: 	409 - undefined - sauravvishal@globussoft.in is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:37:17: 	500 - undefined - userData is not defined - /api/user/register/multiple/random/5 - POST - ::1
+error: Oct-04-2022 13:50:10: 	409 - undefined - $Email or Phone Number is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:50:20: 	409 - undefined - Email or Phone Number is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:50:24: 	405 - undefined - "email" must be a valid email - /api/user/register - POST - ::1
+error: Oct-04-2022 13:50:31: 	409 - undefined - Email or Phone Number is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:50:58: 	409 - undefined - Email or Phone Number is already present. - /api/user/register - POST - ::1
+error: Oct-04-2022 13:51:03: 	409 - undefined - Email or Phone Number is already present. - /api/user/register - POST - ::1

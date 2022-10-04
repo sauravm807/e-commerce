@@ -19,38 +19,18 @@ module.exports = function (sequelize, Sequelize) {
       //     is: /^[0-9a-f]{64}$/i
       //   }
     },
-    fullName: {
-      type: Sequelize.STRING
-    },
-    firstName: {
-      type: Sequelize.STRING
-    },
-    lastName: {
-      type: Sequelize.STRING
-    },
-    proPic: {
-      type: Sequelize.STRING
-    },
-    phoneNo: {
-      type: Sequelize.STRING
-    },
-    address: {
-      type: Sequelize.STRING
-    },
-    wrongPassCount: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    createdAt: {
-      type: 'TIMESTAMP',
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+    created_at: {
+      type: Sequelize.INTEGER(11),
+      defaultValue: Sequelize.fn('NOW'),
       allowNull: false
     },
-    updatedAt: {
-      type: 'TIMESTAMP',
-      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+    updated_at: {
+      type: Sequelize.INTEGER(11),
+      defaultValue: Sequelize.fn('NOW'),
       allowNull: false
     }
+  }, {
+    createdAt: "created_at",
+    updatedAt: "updated_at"
   });
 };

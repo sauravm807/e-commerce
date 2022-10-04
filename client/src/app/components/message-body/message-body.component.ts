@@ -44,7 +44,6 @@ export class MessageBodyComponent implements OnInit {
     this.userService.getUserDetails().subscribe({
       next: res => {
         this.usersList = res.data;
-        // console.log(this.usersList);
         this.usersListCopy = this.usersList;
       },
       error: err => {
@@ -58,11 +57,7 @@ export class MessageBodyComponent implements OnInit {
     this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
       this.onlineUserArr = usersArr;
       this.usersList = this.usersList.map((elem: any) => {
-        if (usersArr.includes(elem?.id)) {
-          elem["isOnline"] = true;
-        } else {
-          elem["isOnline"] = false;
-        }
+        elem["isOnline"] = usersArr.includes(elem?.id);
         return elem;
       });
       console.log(this.usersList);
@@ -170,6 +165,7 @@ export class MessageBodyComponent implements OnInit {
    * onShowMessage - for showing messages section
    */
   onShowMessage(user: any) {
+    console.log(user)
     this.showMessages = true;
     this.currentFriend = user;
   }
