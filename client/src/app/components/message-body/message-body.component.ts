@@ -55,12 +55,13 @@ export class MessageBodyComponent implements OnInit {
 
     this.socketService.setupSocketConnection();
     this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
+      console.log(usersArr);
       this.onlineUserArr = usersArr;
       this.usersList = this.usersList.map((elem: any) => {
         elem["isOnline"] = usersArr.includes(elem?.id);
         return elem;
       });
-      console.log(this.usersList);
+      // console.log(this.usersList);
     });
   }
 
@@ -165,7 +166,6 @@ export class MessageBodyComponent implements OnInit {
    * onShowMessage - for showing messages section
    */
   onShowMessage(user: any) {
-    console.log(user)
     this.showMessages = true;
     this.currentFriend = user;
   }

@@ -155,12 +155,13 @@ class AuthController {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
 
-            const query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE email = "${userData.email}";`;
+            let query = `SELECT u.id, u.email,u.password, um.full_name, um.first_name, um.last_name
+                            FROM users u INNER JOIN usermeta um 
+                            ON u.id = um.user_id WHERE u.email = "${userData.email}";`;
 
             let [user] = await dbOperation.select(query);
 
             if (!user) throw createError.NotFound("Email not found.");
-
             const isMatch = await matchPassword({
                 password: userData.password,
                 hash: user.password
@@ -172,18 +173,32 @@ class AuthController {
                 throw createError.BadRequest(`Login has been blocked try after ${ttl} seconds`);
             }
 
+            query = `SELECT id, wrong_pass_count FROM wrong_passwords WHERE user_id = ${user.id};`;
+            const [countData] = await dbOperation.select(query);
+
             if (!isMatch) {
-                let count = user.wrongPassCount;
-                if (count < 3) {
-                    const query = `UPDATE users SET wrongPassCount = ${++count} WHERE id = ${user.id};`;
-                    await dbOperation.update(query);
-                    throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}.`);
+                if (!countData?.wrong_pass_count) {
+                    query = `INSERT INTO wrong_passwords (user_id, wrong_pass_count) VALUES (${user.id}, ${1});`;
+                    await dbOperation.insert(query);
+                    throw createError.Unauthorized(`Password do not match. Wrong attempt count 1.`);
                 } else {
-                    const result = await redisService.setId(user.id);
-                    const query = `UPDATE users SET wrongPassCount = 0 WHERE id = ${user.id};`;
-                    await dbOperation.update(query);
-                    throw createError.BadRequest(`Login has been blocked try after one minute`);
+                    let count = countData?.wrong_pass_count;
+                    if (count < 3) {
+                        query = `UPDATE wrong_passwords SET wrong_pass_count = ${++count} WHERE id = ${countData.id};`;
+                        await dbOperation.update(query);
+                        throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}.`);
+                    } else {
+                        const result = await redisService.setId(user.id);
+                        query = `UPDATE wrong_passwords SET wrong_pass_count = 0 WHERE id = ${countData.id};`;
+                        await dbOperation.update(query);
+                        throw createError.BadRequest(`Login has been blocked try after one minute`);
+                    }
                 }
+            }
+
+            if (countData?.wrong_pass_count) {
+                query = `UPDATE wrong_passwords SET wrong_pass_count = 0 WHERE id = ${countData.id};`;
+                await dbOperation.update(query);
             }
 
             const uuid = createUuid();
@@ -191,11 +206,13 @@ class AuthController {
 
             const refreshToken = await createRefreshToken({ userId: user.id, uuid }); // create refresh token with payload uuid
 
-            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
+            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60;
 
-            const insertQry = `INSERT INTO uuids (userId, uuid, token, refreshtoken_expires_time) VALUES (${user.id},"${uuid}","${accessToken}",${expiryTime});`;
+            query = `INSERT INTO uuids (user_id, uuid, token, refreshtoken_expires_time, created_at) 
+                        VALUES 
+                        (${user.id},"${uuid}","${accessToken}",${expiryTime}, ${Math.floor(new Date().getTime() / 1000)});`;
 
-            const insertData = await dbOperation.insert(insertQry);
+            const insertData = await dbOperation.insert(query);
 
             if (!insertData || insertData[1] <= 0) throw createError.BadRequest("Something went wrong.");
 
@@ -224,7 +241,7 @@ class AuthController {
      */
     async userLogout(req, res, next) {
         try {
-            const { id, uuid } = req.user;
+            const { uuid } = req.user;
             let query = `SELECT * FROM uuids WHERE uuid = "${uuid}";`;
 
             const [tokenData] = await dbOperation.select(query);
@@ -247,16 +264,17 @@ class AuthController {
         try {
             const { userId, id } = req.userRefresh;
 
-            let query = `SELECT userId FROM uuids WHERE uuid = "${id}";`;
+            let query = `SELECT user_id FROM uuids WHERE uuid = "${id}";`;
 
             const [isuuidPres] = await dbOperation.select(query);
 
             if (!isuuidPres) throw createError.NotFound("Token not found in db.");
 
-            query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE id = ${userId};`;
+            query = `SELECT u.id, u.email,u.password, um.full_name, um.first_name, um.last_name FROM users u 
+                        INNER JOIN usermeta um 
+                        ON u.id = um.user_id WHERE u.id = "${userId}";`;
 
             const [userData] = await dbOperation.select(query);
-
             const uuid = createUuid();
 
             const accessToken = await createAccessToken({ user: userData, uuid: uuid });
@@ -265,7 +283,8 @@ class AuthController {
 
             const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60;
 
-            query = `INSERT INTO uuids (userId,uuid,token,refreshtoken_expires_time) VALUES (${userId},"${uuid}","${accessToken}",${expiryTime});`
+            query = `INSERT INTO uuids (user_id, uuid, token, refreshtoken_expires_time, created_at)    
+                    VALUES (${userId}, "${uuid}", "${accessToken}", ${expiryTime}, ${Math.round(new Date().getTime() / 1000)});`;
 
             const insertData = await dbOperation.insert(query);
 
@@ -292,7 +311,7 @@ class AuthController {
         try {
             const { id } = req.user;
 
-            let query = `SELECT * FROM uuids WHERE userId = ${id};`;
+            let query = `SELECT * FROM uuids WHERE user_id = ${id};`;
 
             const data = await dbOperation.select(query);
 
@@ -304,7 +323,7 @@ class AuthController {
 
             const result = await Promise.all(promises);
 
-            query = `DELETE FROM uuids WHERE userId = ${id};`;
+            query = `DELETE FROM uuids WHERE user_id = ${id};`;
 
             await dbOperation.delete(query);
 

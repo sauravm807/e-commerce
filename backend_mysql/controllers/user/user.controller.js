@@ -19,12 +19,13 @@ class UserController {
 
             const { id, email, fullName, firstName, lastName } = req.user;
 
-            const query = `SELECT address, proPic, phoneNo FROM users WHERE id = ${id};`;
+            const query = `SELECT address, pro_pic, phone_no FROM usermeta WHERE user_id = ${id};`;
 
             const [userData] = await dbOperation.select(query);
 
             res.status(200).json({
                 status: 200,
+                message: "User data fetched successfully",
                 data: {
                     id,
                     email,
@@ -32,8 +33,8 @@ class UserController {
                     firstName,
                     lastName,
                     address: userData?.address || null,
-                    phoneNo: userData?.phoneNo || null,
-                    proPic: userData?.proPic || null
+                    phoneNo: userData?.phone_no || null,
+                    proPic: userData?.pro_pic || null
                 }
             });
         } catch (error) {
@@ -57,10 +58,10 @@ class UserController {
             const isUploadImagePath = await uploadPic({ base64, type, id });
             if (!isUploadImagePath) throw createError.BadRequest("Something went wrong");
 
-            let query = `SELECT proPic FROM users WHERE id = ${id}`
+            let query = `SELECT pro_pic FROM usermeta WHERE id = ${id};`;
             const [picData] = await dbOperation.select(query);
 
-            query = `UPDATE users SET proPic = "${isUploadImagePath}" WHERE id = ${id};`;
+            query = `UPDATE usermeta SET pro_pic = "${isUploadImagePath}" WHERE id = ${id};`;
 
             const updateData = await dbOperation.update(query);
             if (updateData[1] > 0) {
@@ -91,9 +92,9 @@ class UserController {
             searchText = searchText?.trim();
             if (!searchText) throw createError.NotFound("Search Item is required.");
 
-            const query = `SELECT id, fullName, proPic, email 
-                    FROM users WHERE (fullName like "%${searchText}%" OR phoneNo LIKE "%${searchText}%") 
-                    AND id <> ${id} ORDER BY email;`;
+            const query = `SELECT u.id, um.full_name AS fullName, um.pro_pic AS proPic, u.email 
+                    FROM users u INNER JOIN usermeta um ON u.id = um.user_id WHERE (um.full_name LIKE "%${searchText}%" OR um.phone_no LIKE "%${searchText}%") 
+                    AND u.id <> ${id} ORDER BY u.email;`;
             const searchedData = await dbOperation.select(query);
 
             if (!searchedData.length) throw createError.NotFound("No user found.");
@@ -112,7 +113,8 @@ class UserController {
         try {
             const { id } = req.user;
 
-            let query = `SELECT id, fullName, proPic FROM users WHERE id <> ${id} LIMIT 10;`;
+            let query = `SELECT u.id, um.full_name as fullName, um.pro_pic as proPic FROM users u INNER JOIN usermeta um
+                    on u.id = um.user_id WHERE u.id <> ${id} LIMIT 10;`;
             const data = await dbOperation.select(query);
 
             if (!data.length) throw createError.NotFound("No users found.");

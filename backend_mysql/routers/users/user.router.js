@@ -8,7 +8,7 @@ const { authenticateAccessToken, authenticateRefreshToken, deleteToken } = requi
 
 userRouter.post("/register", authController.registerOneUser);
 
-userRouter.post("/register/multiple/random/:no", authController.registerMultipleRandomUser);
+// userRouter.post("/register/multiple/random/:no", authController.registerMultipleRandomUser);
 
 userRouter.post("/login", authController.userLogin);
 
