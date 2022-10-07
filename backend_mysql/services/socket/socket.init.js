@@ -2,6 +2,7 @@
 
 const { Server } = require("socket.io");
 let users = [];
+let disconnectedUsers = [];
 let connections = [];
 const dbOperation = require("../../connection/sql.connection");
 
@@ -19,42 +20,66 @@ module.exports = function (server) {
             users.push({ userId, lastLogin: currTime });
             connections.push({ socketId: socket.id, userId });
             users = [...new Map(users.map(item => [item['userId'], item])).values()];
+
+            const index = disconnectedUsers.findIndex(elem => elem.userId === userId);
+            if (index > -1) disconnectedUsers.splice(index, 1);
+           
+            // io.emit("update users", users);
+            io.emit("update users", { users, disconnectedUsers });
+
+
+            // const lastLoginData = await updateLastLogin(userId);
             // users = users.map(elem => {
-            //     if (!elem.lastLogin) {
-            //         elem = { id: elem, lastLogin: currTime };
-            //     } else {
-            //         const index = users.findIndex(item => item.id === elem.id);
-            //         if (index !== -1) {
-            //             items[index] = 1010;
-            //         }
-            //     }
+            //     if (elem.userId === lastLoginData.userId) elem.lastLogin = lastLoginData.lastLogin;
             //     return elem;
             // });
-            console.log("join users====", users)
-            io.emit("update users", users);
         });
 
-        socket.on('disconnect', () => {
-            const user = connections.find(elem => elem.socketId === socket.id);
+        socket.on('disconnect', async () => {
+            const userId = connections.find(elem => elem.socketId === socket.id)?.userId;
+            const currTime = Math.round(new Date().getTime() / 1000);
+            await dbOperation.update(`Update usermeta set last_login = ${currTime} where user_id = ${userId};`);
             connections = connections.filter(elem => elem.socketId !== socket.id);
-
-            const index = connections.findIndex(elem => elem.userId === user?.userId);
-
+            const index = connections.findIndex(elem => elem.userId === userId);
             if (index && index === -1) {
-                if (user?.userId) {
-                    const i = users.findIndex(elem => elem.id === user?.userId);
-                    users.splice(i, 1);
+                const i = users.findIndex(elem => elem.userId === userId);
+                if (i !== -1) {
+                    const updatedUsers = users.splice(i, 1);
+                    disconnectedUsers.push(updatedUsers[0]);
+                    disconnectedUsers[disconnectedUsers.length - 1].lastLogin = currTime;
                 }
             }
-            console.log(users)
-            io.emit("update users", users);
-        });
+            
+            // io.emit("update users", users);
+            io.emit("update users", { users, disconnectedUsers });
 
-        socket.on('logout all', (id) => {
-            const index = users.findIndex(elem => elem.id === id);
-            users.splice(index, 1);
+
+            // const lastLoginData = await updateLastLogin(userId);
+            // users = users.map(elem => {
+            //     console.log(elem.userId, lastLoginData.userId)
+            //     if (elem.userId === lastLoginData.userId) elem.lastLogin = lastLoginData.lastLogin;
+            //     return elem;
+            // });
+        });
+        
+        // function updateLastLogin(userId) {
+        //     return new Promise(async (resolve, reject) => {
+        //         const query = `SELECT user_id, last_login FROM usermeta WHERE user_id = ${userId};`;
+        //         const [lastLogin] = await dbOperation.select(query);
+        //         resolve({ userId, lastLogin: lastLogin.last_login });
+        //     })
+        // }
+
+        socket.on('logout all', async (id) => {
+            const currTime = Math.round(new Date().getTime() / 1000);
+            await dbOperation.update(`Update usermeta set last_login = ${currTime} where user_id = ${id};`);
+            const index = users.findIndex(elem => elem.userId === id);
+            const usersDisconnected = users.splice(index, 1);
+            disconnectedUsers.push(usersDisconnected[0]);
+            disconnectedUsers[disconnectedUsers.length - 1].lastLogin = currTime;
             connections = connections.filter(elem => elem.userId !== id);
-            io.emit("update users", users);
+            
+            io.emit("update users", { users, disconnectedUsers });
         });
     });
 }

@@ -51,17 +51,21 @@ export class MessageBodyComponent implements OnInit {
       }
     });
 
-
-
     this.socketService.setupSocketConnection();
-    this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
-      console.log(usersArr);
-      this.onlineUserArr = usersArr;
+    this.socketService.onlineUsersMessage.subscribe((userData: any) => {
+      const onlineIds: any[] = [];
+      const usersArr = userData.users;
+      const disconnectedArr = userData.disconnectedUsers;
+      if (usersArr?.length) usersArr.forEach((elem: any) => {
+        onlineIds.push(elem.userId);
+      });
+
       this.usersList = this.usersList.map((elem: any) => {
-        elem["isOnline"] = usersArr.includes(elem?.id);
+        elem["isOnline"] = onlineIds.includes(elem?.id);
+        const lastLoginData = disconnectedArr.find((item: any) => elem.id === item.userId);
+        if (lastLoginData) elem["lastLogin"] = lastLoginData.lastLogin;
         return elem;
       });
-      // console.log(this.usersList);
     });
   }
 
@@ -78,36 +82,36 @@ export class MessageBodyComponent implements OnInit {
     searchTerm.subscribe(res => {
       if (res.trim()) {
         this.userService.searchUserList(res)
-        .pipe(
-          map(val => {
-            val = val.data;
-            val.forEach((elem: any) => {
-              elem["username"] = elem.email.split("@")[0];
-            });
-            return val;
-          })
-        )
-        .subscribe({
-          next: res => {
-            this.ifSearchFriendList = true;
-            this.usersList = res;
-            this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
-              this.onlineUserArr = usersArr;
-              this.usersList = this.usersList.map((elem: any) => {
-                if (usersArr.includes(elem?.id)) {
-                  elem["isOnline"] = true;
-                } else {
-                  elem["isOnline"] = false;
-                }
-                return elem;
+          .pipe(
+            map(val => {
+              val = val.data;
+              val.forEach((elem: any) => {
+                elem["username"] = elem.email.split("@")[0];
               });
-              console.log(this.usersList);
-            });
-          },
-          error: err => {
-            this.usersList = []
-          }
-        });
+              return val;
+            })
+          )
+          .subscribe({
+            next: res => {
+              this.ifSearchFriendList = true;
+              this.usersList = res;
+              this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
+                const onlineIds: any[] = [];
+                usersArr.forEach((elem: any) => {
+                  onlineIds.push(elem.userId);
+                });
+
+                this.onlineUserArr = usersArr;;
+                this.usersList = this.usersList.map((elem: any) => {
+                  elem["isOnline"] = onlineIds.includes(elem?.id);
+                  return elem;
+                });
+              });
+            },
+            error: err => {
+              this.usersList = []
+            }
+          });
       } else {
         this.ifSearchFriendList = false;
         this.usersList = this.usersListCopy;

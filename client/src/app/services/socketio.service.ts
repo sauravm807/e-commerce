@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
 export class SocketioService {
   socket: any;
   userId: any;
+  onlineUsersList: any = [];
   private onlineUsers = new BehaviorSubject([]);
   onlineUsersMessage = this.onlineUsers.asObservable();
 
@@ -41,8 +42,9 @@ export class SocketioService {
   }
 
   getOnlineUsers() {
-    this.socket.on("update users", (users: any) => {
-      this.onlineUsers.next(users);
+    this.socket.on("update users", (usersData: any) => {
+      this.onlineUsersList = usersData.users;
+      this.onlineUsers.next(usersData);
     });
   }
 }

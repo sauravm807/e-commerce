@@ -92,7 +92,7 @@ class UserController {
             searchText = searchText?.trim();
             if (!searchText) throw createError.NotFound("Search Item is required.");
 
-            const query = `SELECT u.id, um.full_name AS fullName, um.pro_pic AS proPic, u.email 
+            const query = `SELECT u.id, um.full_name AS fullName, um.pro_pic AS proPic, um.last_login as lastLogin, u.email 
                     FROM users u INNER JOIN usermeta um ON u.id = um.user_id WHERE (um.full_name LIKE "%${searchText}%" OR um.phone_no LIKE "%${searchText}%") 
                     AND u.id <> ${id} ORDER BY u.email;`;
             const searchedData = await dbOperation.select(query);
@@ -113,7 +113,7 @@ class UserController {
         try {
             const { id } = req.user;
 
-            let query = `SELECT u.id, um.full_name as fullName, um.pro_pic as proPic FROM users u INNER JOIN usermeta um
+            let query = `SELECT u.id, um.full_name as fullName, um.pro_pic as proPic, um.last_login as lastLogin FROM users u INNER JOIN usermeta um
                     on u.id = um.user_id WHERE u.id <> ${id} LIMIT 10;`;
             const data = await dbOperation.select(query);
 
