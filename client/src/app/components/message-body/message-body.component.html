@@ -23,7 +23,7 @@
               <span class="ml-5"><b>{{currentFriend.fullName}}</b></span>
               <span class="last-seen" *ngIf="currentFriend.isOnline">Online</span>
               <span class="last-seen" *ngIf="!currentFriend.isOnline && currentFriend.lastLogin">
-                {{currentFriend.lastLogin * 1000 | date: "M/d/yy, h:mm a"}}
+                {{currentFriend.lastLogin * 1000 | date: "d/M/yy, h:mm a"}}
               </span>
 
             </div>

@@ -260,6 +260,13 @@ class AuthController {
         }
     }
 
+    /**
+     * generateTokens - to generate tokens from refresh token
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @author Saurav Vishal <sauravvishal@globussoft.in>
+     */
     async generateTokens(req, res, next) {
         try {
             const { userId, id } = req.userRefresh;
@@ -307,6 +314,13 @@ class AuthController {
         }
     }
 
+    /**
+     * userLogoutAllTokens - to logout all tokens of user
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @author Saurav Vishal <sauravvishal@globussoft.in>
+     */
     async userLogoutAllTokens(req, res, next) {
         try {
             const { id } = req.user;

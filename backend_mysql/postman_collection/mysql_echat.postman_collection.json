@@ -1,0 +1,354 @@
+{
+	"info": {
+		"_postman_id": "d7b9b079-738f-44d3-97da-efb36330835c",
+		"name": "mysql_echat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\",\r\n    \"repeatPassword\": \"sauravvishal@globussoft.in\",\r\n    \"fullName\": \"Saurav Vishal\",\r\n    \"firstName\": \"Saurav\",\r\n    \"lastName\": \"Vishal\",\r\n    \"phoneNo\": \"+919342234765\",\r\n    \"address\": \"Bhilai India\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/user/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register multiple users",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/register/multiple/random/1000",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"register",
+						"multiple",
+						"random",
+						"1000"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"sauravvishal@globussoft.in\",\r\n    \"password\": \"sauravvishal@globussoft.in\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/user/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZGFuaWVsbGVoaW50ei5yYXUxQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoiRGFuaWVsbGUgSGludHoiLCJmaXJzdE5hbWUiOiJEYW5pZWxsZSIsImxhc3ROYW1lIjoiSGludHoiLCJ1dWlkIjoiMWY5MzdjZTAtZWYwNC00MDRiLTg1NjktN2IxZjAzYWM5MjhhIiwiaWF0IjoxNjY0ODgwNzU1LCJleHAiOjE2NjQ4ODQzNTV9.H3a7-qekZ2T_KI_2FZTT6ct1M_jdIBPzml7gDAxWbQQ",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/logout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get tokens by refresh token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjI5LCJpZCI6ImE2ZGQ5NWMxLTQxNDQtNDg3Mi1iZTIzLTEyOWE0OTk0ZGE1OCIsImlhdCI6MTY2NDg3OTM5OCwiZXhwIjoxNjY0OTY1Nzk4fQ.XVktYZhH_JUGC1JH18RaP4ZxOwMxNej7dh8NJ40RGrs\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/user/get/tokens",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"get",
+						"tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "logout from all devices",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZGFuaWVsbGVoaW50ei5yYXUxQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoiRGFuaWVsbGUgSGludHoiLCJmaXJzdE5hbWUiOiJEYW5pZWxsZSIsImxhc3ROYW1lIjoiSGludHoiLCJ1dWlkIjoiZjU0MjY2OTktMTcwYS00MWYwLWFmNjktMTYyOTUzNDBhMzUwIiwiaWF0IjoxNjY0ODc5MTAzLCJleHAiOjE2NjQ4ODI3MDN9.3MZKIJqp0Hf9skizycSf6b6KtMZ1431zehMkkDQJnbo",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/logout/all-tokens",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"logout",
+						"all-tokens"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search User",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZGFuaWVsbGVoaW50ei5yYXUxQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoiRGFuaWVsbGUgSGludHoiLCJmaXJzdE5hbWUiOiJEYW5pZWxsZSIsImxhc3ROYW1lIjoiSGludHoiLCJ1dWlkIjoiMjA4NzgzYzEtMjJkZS00NTEzLWEwYTEtYzgwNWFjMTI4MzVhIiwiaWF0IjoxNjY0ODgxMDAzLCJleHAiOjE2NjQ4ODQ2MDN9.tM5XeiADALVYvvA_3c_u2gBlx6PDjt-rCAeGl0FARqI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"searchText\": \"sau\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8088/api/user/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get logged in user data",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJzYXVyYXZ2aXNoYWxAZ2xvYnVzc29mdC5pbiIsImZ1bGxOYW1lIjoiU2F1cmF2IFZpc2hhbCIsImZpcnN0TmFtZSI6IlNhdXJhdiIsImxhc3ROYW1lIjoiVmlzaGFsIiwidXVpZCI6ImQ1MjI2MTQzLWIxNjYtNDkxMS05ODZkLTNkZDViOTY2ZDg2YiIsImlhdCI6MTY2NDg4NDM0MSwiZXhwIjoxNjY0ODg3OTQxfQ.XmV4st36XJIvkVZ1-SyqzNJjTXrBJ9vfj62Ns3E2jhE",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get users",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImVtYWlsIjoiZGFuaWVsbGVoaW50ei5yYXUxQGdtYWlsLmNvbSIsImZ1bGxOYW1lIjoiRGFuaWVsbGUgSGludHoiLCJmaXJzdE5hbWUiOiJEYW5pZWxsZSIsImxhc3ROYW1lIjoiSGludHoiLCJ1dWlkIjoiMjA4NzgzYzEtMjJkZS00NTEzLWEwYTEtYzgwNWFjMTI4MzVhIiwiaWF0IjoxNjY0ODgxMDAzLCJleHAiOjE2NjQ4ODQ2MDN9.tM5XeiADALVYvvA_3c_u2gBlx6PDjt-rCAeGl0FARqI",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/friends",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"friends"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get chat list",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJzYXVyYXZ2aXNoYWxAZ2xvYnVzc29mdC5pbiIsImZ1bGxOYW1lIjoiU2F1cmF2IFZpc2hhbCIsImZpcnN0TmFtZSI6IlNhdXJhdiIsImxhc3ROYW1lIjoiVmlzaGFsIiwidXVpZCI6IjQzZDQ1YjNjLWQ2Y2ItNDUyNS1iOTY4LWY4NDc3YWI2Y2NiOCIsImlhdCI6MTY2NTIxNzE1MiwiZXhwIjoxNjY1MjIwNzUyfQ.RjUSqoVO6PEyXdx-2VMz3pRrfHiTA7ofBkewS-VRUNs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/chat/chatlist",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"chat",
+						"chatlist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get message by chatid",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJzYXVyYXZ2aXNoYWxAZ2xvYnVzc29mdC5pbiIsImZ1bGxOYW1lIjoiU2F1cmF2IFZpc2hhbCIsImZpcnN0TmFtZSI6IlNhdXJhdiIsImxhc3ROYW1lIjoiVmlzaGFsIiwidXVpZCI6IjQzZDQ1YjNjLWQ2Y2ItNDUyNS1iOTY4LWY4NDc3YWI2Y2NiOCIsImlhdCI6MTY2NTIxNzE1MiwiZXhwIjoxNjY1MjIwNzUyfQ.RjUSqoVO6PEyXdx-2VMz3pRrfHiTA7ofBkewS-VRUNs",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8088/api/user/chat/messages/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8088",
+					"path": [
+						"api",
+						"user",
+						"chat",
+						"messages",
+						"2"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

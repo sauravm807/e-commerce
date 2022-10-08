@@ -60,16 +60,18 @@
 
 .container form .field input:focus,
 .container form .field input:valid {
-  /* border-color: #00A884;; */
-  border-color: #00a884;
+  border-color: #00A884;;
+  /* border-color: #00a884; */
 }
 
 .container form .field input:focus ~ label,
 .container form .field input:valid ~ label {
   top: 0%;
-  font-size: 16px;
+  font-size: 14px;
   color: #00a884;
-  background-color: #fff;
+  background-color: #d9fdd3;
+  border-radius: 10px;
+  padding: 0px 10px !important;
 }
 
 .container form .field label {

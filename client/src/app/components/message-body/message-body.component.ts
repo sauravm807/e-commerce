@@ -52,21 +52,7 @@ export class MessageBodyComponent implements OnInit {
     });
 
     this.socketService.setupSocketConnection();
-    this.socketService.onlineUsersMessage.subscribe((userData: any) => {
-      const onlineIds: any[] = [];
-      const usersArr = userData.users;
-      const disconnectedArr = userData.disconnectedUsers;
-      if (usersArr?.length) usersArr.forEach((elem: any) => {
-        onlineIds.push(elem.userId);
-      });
-
-      this.usersList = this.usersList.map((elem: any) => {
-        elem["isOnline"] = onlineIds.includes(elem?.id);
-        const lastLoginData = disconnectedArr.find((item: any) => elem.id === item.userId);
-        if (lastLoginData) elem["lastLogin"] = lastLoginData.lastLogin;
-        return elem;
-      });
-    });
+    this.getUpdatedUsers();
   }
 
   ngOnDestroy() {
@@ -95,18 +81,7 @@ export class MessageBodyComponent implements OnInit {
             next: res => {
               this.ifSearchFriendList = true;
               this.usersList = res;
-              this.socketService.onlineUsersMessage.subscribe((usersArr: any) => {
-                const onlineIds: any[] = [];
-                usersArr.forEach((elem: any) => {
-                  onlineIds.push(elem.userId);
-                });
-
-                this.onlineUserArr = usersArr;;
-                this.usersList = this.usersList.map((elem: any) => {
-                  elem["isOnline"] = onlineIds.includes(elem?.id);
-                  return elem;
-                });
-              });
+              this.getUpdatedUsers();
             },
             error: err => {
               this.usersList = []
@@ -116,6 +91,25 @@ export class MessageBodyComponent implements OnInit {
         this.ifSearchFriendList = false;
         this.usersList = this.usersListCopy;
       }
+    });
+  }
+
+  getUpdatedUsers() {
+    this.socketService.onlineUsersMessage.subscribe((userData: any) => {
+      const onlineIds: any[] = [];
+      const usersArr = userData.users;
+      const disconnectedArr = userData.disconnectedUsers;
+
+      if (usersArr?.length) usersArr.forEach((elem: any) => {
+        onlineIds.push(elem.userId);
+      });
+
+      this.usersList = this.usersList.map((elem: any) => {
+        elem["isOnline"] = onlineIds.includes(elem?.id);
+        const lastLoginData = disconnectedArr.find((item: any) => elem.id === item.userId);
+        if (lastLoginData) elem["lastLogin"] = lastLoginData.lastLogin;
+        return elem;
+      });
     });
   }
 

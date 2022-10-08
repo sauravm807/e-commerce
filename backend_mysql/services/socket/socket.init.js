@@ -24,15 +24,7 @@ module.exports = function (server) {
             const index = disconnectedUsers.findIndex(elem => elem.userId === userId);
             if (index > -1) disconnectedUsers.splice(index, 1);
            
-            // io.emit("update users", users);
             io.emit("update users", { users, disconnectedUsers });
-
-
-            // const lastLoginData = await updateLastLogin(userId);
-            // users = users.map(elem => {
-            //     if (elem.userId === lastLoginData.userId) elem.lastLogin = lastLoginData.lastLogin;
-            //     return elem;
-            // });
         });
 
         socket.on('disconnect', async () => {
@@ -50,25 +42,8 @@ module.exports = function (server) {
                 }
             }
             
-            // io.emit("update users", users);
             io.emit("update users", { users, disconnectedUsers });
-
-
-            // const lastLoginData = await updateLastLogin(userId);
-            // users = users.map(elem => {
-            //     console.log(elem.userId, lastLoginData.userId)
-            //     if (elem.userId === lastLoginData.userId) elem.lastLogin = lastLoginData.lastLogin;
-            //     return elem;
-            // });
         });
-        
-        // function updateLastLogin(userId) {
-        //     return new Promise(async (resolve, reject) => {
-        //         const query = `SELECT user_id, last_login FROM usermeta WHERE user_id = ${userId};`;
-        //         const [lastLogin] = await dbOperation.select(query);
-        //         resolve({ userId, lastLogin: lastLogin.last_login });
-        //     })
-        // }
 
         socket.on('logout all', async (id) => {
             const currTime = Math.round(new Date().getTime() / 1000);

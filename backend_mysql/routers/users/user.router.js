@@ -1,6 +1,8 @@
 "use strict;"
 const userRouter = require("express").Router();
 
+const { chatRouter } = require("../chat/chat.router");
+
 const authController = require("../../controllers/user/auth/auth.controller");
 const userController = require("../../controllers/user/user.controller");
 
@@ -14,15 +16,17 @@ userRouter.post("/login", authController.userLogin);
 
 userRouter.post("/get/tokens", authenticateRefreshToken, authController.generateTokens);
 
-userRouter.post("/forgetpassword", authController.forgetPassword);
+// userRouter.post("/forgetpassword", authController.forgetPassword);
 
-userRouter.post("/verifyotp", authController.verifyOtp);
+// userRouter.post("/verifyotp", authController.verifyOtp);
 
-userRouter.post("/changepasword", authController.changePasword);
+// userRouter.post("/changepasword", authController.changePasword);
 
-userRouter.post("/resendotp", authController.resendOtp);
+// userRouter.post("/resendotp", authController.resendOtp);
 
 userRouter.use(authenticateAccessToken);
+
+userRouter.use("/chat", chatRouter);
 
 userRouter.delete("/logout", deleteToken, authController.userLogout);
 

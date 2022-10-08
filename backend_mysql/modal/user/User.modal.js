@@ -6,7 +6,7 @@ module.exports = function (sequelize, Sequelize) {
       allowNull: false,
       autoIncrement: true,
       primaryKey: true,
-      type: Sequelize.INTEGER(),
+      type: Sequelize.INTEGER(11),
     },
     email: {
       type: Sequelize.STRING,
