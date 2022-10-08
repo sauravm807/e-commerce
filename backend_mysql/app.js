@@ -34,7 +34,7 @@ app.use(express.urlencoded({
     limit: "50mb"
 }));
 
-app.use(morgan('dev'));
+// app.use(morgan('dev'));
 
 app.use(express.static('public'));
 
@@ -69,7 +69,7 @@ app.use((req, res, next) => {
  * error handler
  */
 app.use((err, req, res, next) => {
-    // console.log(err)
+    console.log(err)
     logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.status(err.status || 500).json({
         error: {

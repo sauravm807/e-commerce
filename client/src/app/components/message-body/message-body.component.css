@@ -54,9 +54,14 @@
   /* min-height: 90vh; */
 }
 
-.d-hidden {
-  visibility: hidden;
+.d-online {
+  color: #00a884;
+  font-size: 20px;
 }
+
+/* .d-offline {
+  color: red;
+} */
 
 .hide-message {
   display: flex;

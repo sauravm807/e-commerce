@@ -27,21 +27,47 @@ class AuthController {
         try {
             const userData = await userValidateSchemaRegister.validateAsync(req.body);
 
-            const query = `SELECT id FROM users WHERE email = "${userData.email}"`;
+            const query = `SELECT 
+                                u.email, um.phone_no 
+                            FROM users u INNER JOIN usermeta um ON u.id = um.user_id 
+                            WHERE email = "${userData.email}" OR phone_no = "${userData.phoneNo}";`;
             const ifUserExist = await dbOperation.select(query);
-            if (ifUserExist?.length) throw createError.Conflict(`${userData.email} is already present.`);
+            if (ifUserExist?.length) throw createError.Conflict(`Email or Phone Number is already present.`);
 
             const password = await encryptPassword(userData.password);
             userData.password = password;
             delete userData.repeatPassword;
 
-            const { columns, values } = getColumnValues(userData);
+            const user = {
+                email: userData.email,
+                password: userData.password,
+                created_at: Math.floor(new Date().getTime() / 1000),
+                updated_at: Math.floor(new Date().getTime() / 1000)
+            };
 
-            const insertQry = `INSERT INTO users ${columns} VALUES ${values}`;
+            const { columns, values } = getColumnValues(user);
 
-            const insertData = await dbOperation.insert(insertQry);
+            const query1 = `INSERT INTO users ${columns} VALUES ${values}`;
 
-            if (!insertData) throw createError.BadRequest("User not created.");
+            const insertUser = await dbOperation.insert(query1);
+
+            const userMeta = {
+                user_id: insertUser[0],
+                full_name: userData.fullName,
+                first_name: userData.firstName,
+                last_name: userData.lastName,
+                phone_no: userData.phoneNo,
+                address: userData.address,
+                created_at: Math.floor(new Date().getTime() / 1000),
+                updated_at: Math.floor(new Date().getTime() / 1000)
+            };
+
+            const userMetaValue = getColumnValues(userMeta);
+
+            const query2 = `INSERT INTO usermeta ${userMetaValue.columns} VALUES ${userMetaValue.values}`;
+
+            const insertUserMeta = await dbOperation.insert(query2);
+
             res.status(201).json({
                 status: 201,
                 message: "New user created."
@@ -65,25 +91,48 @@ class AuthController {
         try {
             const { no } = req.params;
             const users = [];
-            let str = "";
+            let userVal = "";
+            let userMetaVal = "";
             for (let i = 0; i < no; i++) {
                 const fullName = faker.name.fullName();
                 const firstName = fullName.split(" ")[0];
                 const lastName = fullName.split(" ")[1];
                 const email = faker.internet.email(fullName).toLowerCase();
                 const phoneNo = faker.phone.number('+91##########');
-                const createdAt = faker.date.between('2021-09-30 10:10:07', '2022-09-30 10:10:07').toISOString().slice(0, 19).replace('T', ' ');;
+                const createdAtStr = faker.date.between('2021-09-30 10:10:07', '2022-09-30 10:10:07').toISOString().slice(0, 19).replace('T', ' ');;
+                const createdAt = new Date(createdAtStr).getTime() / 1000
                 const address = `${faker.address.buildingNumber()} ${faker.address.cardinalDirection()} ${faker.address.city()} ${faker.address.state()}`;
                 const password = await encryptPassword(email);
-                str += `("${email}", "${password}", "${fullName}", "${firstName}", "${lastName}", "${phoneNo}", "${address}", "${createdAt}", "${createdAt}"),`;
+                const user = {
+                    email: email,
+                    password: password,
+                    created_at: createdAt,
+                    updated_at: createdAt
+                };
+
+                const { columns, values } = getColumnValues(user);
+
+                const query1 = `INSERT INTO users ${columns} VALUES ${values}`;
+
+                const insertUser = await dbOperation.insert(query1);
+
+                const userMeta = {
+                    user_id: insertUser[0],
+                    full_name: fullName,
+                    first_name: firstName,
+                    last_name: lastName,
+                    phone_no: phoneNo,
+                    address: address,
+                    created_at: createdAt,
+                    updated_at: createdAt
+                };
+
+                const userMetaValue = getColumnValues(userMeta);
+
+                const query2 = `INSERT INTO usermeta ${userMetaValue.columns} VALUES ${userMetaValue.values}`;
+
+                const insertUserMeta = await dbOperation.insert(query2);
             }
-
-            str = str.substring(0, str.length - 1);
-            let query = `INSERT INTO users (email, password , fullName , firstName , lastName , phoneNo , address, createdAt, updatedAt) VALUES ${str}`;
-
-            const insertData = await dbOperation.insert(query);
-
-            if (!insertData) throw createError.BadRequest("Users not created.");
 
             res.status(201).json({
                 status: 201,
@@ -106,12 +155,13 @@ class AuthController {
         try {
             const userData = await userValidateSchemaLogin.validateAsync(req.body);
 
-            const query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE email = "${userData.email}";`;
+            let query = `SELECT u.id, u.email,u.password, um.full_name, um.first_name, um.last_name
+                            FROM users u INNER JOIN usermeta um 
+                            ON u.id = um.user_id WHERE u.email = "${userData.email}";`;
 
             let [user] = await dbOperation.select(query);
 
             if (!user) throw createError.NotFound("Email not found.");
-
             const isMatch = await matchPassword({
                 password: userData.password,
                 hash: user.password
@@ -123,18 +173,32 @@ class AuthController {
                 throw createError.BadRequest(`Login has been blocked try after ${ttl} seconds`);
             }
 
+            query = `SELECT id, wrong_pass_count FROM wrong_passwords WHERE user_id = ${user.id};`;
+            const [countData] = await dbOperation.select(query);
+
             if (!isMatch) {
-                let count = user.wrongPassCount;
-                if (count < 3) {
-                    const query = `UPDATE users SET wrongPassCount = ${++count} WHERE id = ${user.id};`;
-                    await dbOperation.update(query);
-                    throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}.`);
+                if (!countData?.wrong_pass_count) {
+                    query = `INSERT INTO wrong_passwords (user_id, wrong_pass_count) VALUES (${user.id}, ${1});`;
+                    await dbOperation.insert(query);
+                    throw createError.Unauthorized(`Password do not match. Wrong attempt count 1.`);
                 } else {
-                    const result = await redisService.setId(user.id);
-                    const query = `UPDATE users SET wrongPassCount = 0 WHERE id = ${user.id};`;
-                    await dbOperation.update(query);
-                    throw createError.BadRequest(`Login has been blocked try after one minute`);
+                    let count = countData?.wrong_pass_count;
+                    if (count < 3) {
+                        query = `UPDATE wrong_passwords SET wrong_pass_count = ${++count} WHERE id = ${countData.id};`;
+                        await dbOperation.update(query);
+                        throw createError.Unauthorized(`Password do not match. Wrong attempt count ${count}.`);
+                    } else {
+                        const result = await redisService.setId(user.id);
+                        query = `UPDATE wrong_passwords SET wrong_pass_count = 0 WHERE id = ${countData.id};`;
+                        await dbOperation.update(query);
+                        throw createError.BadRequest(`Login has been blocked try after one minute`);
+                    }
                 }
+            }
+
+            if (countData?.wrong_pass_count) {
+                query = `UPDATE wrong_passwords SET wrong_pass_count = 0 WHERE id = ${countData.id};`;
+                await dbOperation.update(query);
             }
 
             const uuid = createUuid();
@@ -142,11 +206,13 @@ class AuthController {
 
             const refreshToken = await createRefreshToken({ userId: user.id, uuid }); // create refresh token with payload uuid
 
-            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60
+            const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60;
 
-            const insertQry = `INSERT INTO uuids (userId, uuid, token, refreshtoken_expires_time) VALUES (${user.id},"${uuid}","${accessToken}",${expiryTime});`;
+            query = `INSERT INTO uuids (user_id, uuid, token, refreshtoken_expires_time, created_at) 
+                        VALUES 
+                        (${user.id},"${uuid}","${accessToken}",${expiryTime}, ${Math.floor(new Date().getTime() / 1000)});`;
 
-            const insertData = await dbOperation.insert(insertQry);
+            const insertData = await dbOperation.insert(query);
 
             if (!insertData || insertData[1] <= 0) throw createError.BadRequest("Something went wrong.");
 
@@ -175,7 +241,7 @@ class AuthController {
      */
     async userLogout(req, res, next) {
         try {
-            const { id, uuid } = req.user;
+            const { uuid } = req.user;
             let query = `SELECT * FROM uuids WHERE uuid = "${uuid}";`;
 
             const [tokenData] = await dbOperation.select(query);
@@ -194,20 +260,28 @@ class AuthController {
         }
     }
 
+    /**
+     * generateTokens - to generate tokens from refresh token
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @author Saurav Vishal <sauravvishal@globussoft.in>
+     */
     async generateTokens(req, res, next) {
         try {
             const { userId, id } = req.userRefresh;
 
-            let query = `SELECT userId FROM uuids WHERE uuid = "${id}";`;
+            let query = `SELECT user_id FROM uuids WHERE uuid = "${id}";`;
 
             const [isuuidPres] = await dbOperation.select(query);
 
             if (!isuuidPres) throw createError.NotFound("Token not found in db.");
 
-            query = `SELECT id,email,password,wrongPassCount,fullName,firstName,lastName FROM users WHERE id = ${userId};`;
+            query = `SELECT u.id, u.email,u.password, um.full_name, um.first_name, um.last_name FROM users u 
+                        INNER JOIN usermeta um 
+                        ON u.id = um.user_id WHERE u.id = "${userId}";`;
 
             const [userData] = await dbOperation.select(query);
-
             const uuid = createUuid();
 
             const accessToken = await createAccessToken({ user: userData, uuid: uuid });
@@ -216,7 +290,8 @@ class AuthController {
 
             const expiryTime = Math.round(new Date().getTime() / 1000) + 24 * 60 * 60;
 
-            query = `INSERT INTO uuids (userId,uuid,token,refreshtoken_expires_time) VALUES (${userId},"${uuid}","${accessToken}",${expiryTime});`
+            query = `INSERT INTO uuids (user_id, uuid, token, refreshtoken_expires_time, created_at)    
+                    VALUES (${userId}, "${uuid}", "${accessToken}", ${expiryTime}, ${Math.round(new Date().getTime() / 1000)});`;
 
             const insertData = await dbOperation.insert(query);
 
@@ -239,26 +314,33 @@ class AuthController {
         }
     }
 
+    /**
+     * userLogoutAllTokens - to logout all tokens of user
+     * @param {*} req 
+     * @param {*} res 
+     * @param {*} next 
+     * @author Saurav Vishal <sauravvishal@globussoft.in>
+     */
     async userLogoutAllTokens(req, res, next) {
         try {
             const { id } = req.user;
 
-            let query = `SELECT * FROM uuids WHERE userId = ${id};`;
+            let query = `SELECT * FROM uuids WHERE user_id = ${id};`;
 
             const data = await dbOperation.select(query);
 
             const promises = [];
-            
+
             data.forEach(item => {
                 promises.push(redisService.setLoggedOutToken(item.token));
             });
 
             const result = await Promise.all(promises);
-            
-            query = `DELETE FROM uuids WHERE userId = ${id};`;
+
+            query = `DELETE FROM uuids WHERE user_id = ${id};`;
 
             await dbOperation.delete(query);
-            
+
             if (result.length) return res.status(200).json({
                 code: 200,
                 message: "User logged out from all devices"

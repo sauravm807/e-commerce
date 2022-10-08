@@ -19,9 +19,10 @@ export class MessageBodyComponent implements OnInit {
   ifSearchFriendList: boolean = false;
   userData: any = {};
   basePath: string = "";
-  usersList: any = [];
-  usersListCopy: any = [];
+  usersList: Array<any> = [];
+  usersListCopy: Array<any> = [];
   currentFriend: any = [];
+  onlineUserArr: any = [];
 
   @ViewChild('search') search: any;
 
@@ -51,6 +52,7 @@ export class MessageBodyComponent implements OnInit {
     });
 
     this.socketService.setupSocketConnection();
+    this.getUpdatedUsers();
   }
 
   ngOnDestroy() {
@@ -66,28 +68,48 @@ export class MessageBodyComponent implements OnInit {
     searchTerm.subscribe(res => {
       if (res.trim()) {
         this.userService.searchUserList(res)
-        .pipe(
-          map(val => {
-            val = val.data;
-            val.forEach((elem: any) => {
-              elem["username"] = elem.email.split("@")[0];
-            });
-            return val;
-          })
-        )
-        .subscribe({
-          next: res => {
-            this.ifSearchFriendList = true;
-            this.usersList = res;
-          },
-          error: err => {
-            this.usersList = []
-          }
-        });
+          .pipe(
+            map(val => {
+              val = val.data;
+              val.forEach((elem: any) => {
+                elem["username"] = elem.email.split("@")[0];
+              });
+              return val;
+            })
+          )
+          .subscribe({
+            next: res => {
+              this.ifSearchFriendList = true;
+              this.usersList = res;
+              this.getUpdatedUsers();
+            },
+            error: err => {
+              this.usersList = []
+            }
+          });
       } else {
         this.ifSearchFriendList = false;
         this.usersList = this.usersListCopy;
       }
+    });
+  }
+
+  getUpdatedUsers() {
+    this.socketService.onlineUsersMessage.subscribe((userData: any) => {
+      const onlineIds: any[] = [];
+      const usersArr = userData.users;
+      const disconnectedArr = userData.disconnectedUsers;
+
+      if (usersArr?.length) usersArr.forEach((elem: any) => {
+        onlineIds.push(elem.userId);
+      });
+
+      this.usersList = this.usersList.map((elem: any) => {
+        elem["isOnline"] = onlineIds.includes(elem?.id);
+        const lastLoginData = disconnectedArr.find((item: any) => elem.id === item.userId);
+        if (lastLoginData) elem["lastLogin"] = lastLoginData.lastLogin;
+        return elem;
+      });
     });
   }
 
@@ -105,6 +127,7 @@ export class MessageBodyComponent implements OnInit {
           this.authService.removeTokens();
           this.toastr.success(res.message);
           this.router.navigate(["login"]);
+          this.socketService.disconnect();
         },
         error: err => {
           if (err.error.error.status === 404) {
@@ -125,6 +148,7 @@ export class MessageBodyComponent implements OnInit {
     this.authService.userLogoutAllDevices()
       .subscribe({
         next: (res: any) => {
+          this.socketService.logoutAll();
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           this.toastr.success(res.message);

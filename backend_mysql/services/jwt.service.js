@@ -7,9 +7,9 @@ module.exports = {
       jwt.sign({
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        fullName: user.full_name,
+        firstName: user.first_name,
+        lastName: user.last_name,
         uuid: uuid
       }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: 1 * 60 * 60 }, function (err, token) {
         if (err) reject("Internal server error");

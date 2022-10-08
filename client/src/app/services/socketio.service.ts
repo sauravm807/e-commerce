@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
@@ -9,6 +10,10 @@ import { AuthService } from './auth.service';
 export class SocketioService {
   socket: any;
   userId: any;
+  onlineUsersList: any = [];
+  private onlineUsers = new BehaviorSubject([]);
+  onlineUsersMessage = this.onlineUsers.asObservable();
+
   constructor(private authService: AuthService) {
     this.authService.userDataMessage.subscribe({
       next: (res: any) => {
@@ -19,18 +24,27 @@ export class SocketioService {
 
   setupSocketConnection() {
     this.socket = io(environment.SOCKET_ENDPOINT_MYSQL);
-    this.socket.emit('my message', this.userId);
     this.socket.on("connect", () => {
-      console.log(this.socket.id)
+      this.socket.emit('joinUser', this.userId);
     });
-    // this.socket.on('my broadcast', (data: string) => {
-    //   console.log(data);
-    // });
+    this.getOnlineUsers();
   }
 
   disconnect() {
+    this.getOnlineUsers();
     if (this.socket) {
       this.socket.disconnect();
     }
+  }
+
+  logoutAll() {
+    this.socket.emit("logout all", this.userId);
+  }
+
+  getOnlineUsers() {
+    this.socket.on("update users", (usersData: any) => {
+      this.onlineUsersList = usersData.users;
+      this.onlineUsers.next(usersData);
+    });
   }
 }

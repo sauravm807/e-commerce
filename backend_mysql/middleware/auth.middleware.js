@@ -4,9 +4,6 @@ const createError = require('http-errors');
 const { verifyAccessToken, verifyRefreshToken } = require("../services/jwt.service");
 const { setLoggedOutToken, getLoggedOutToken } = require("../services/redis.service");
 
-const dbOperation = require("../connection/sql.connection");
-
-
 module.exports = {
     authenticateAccessToken: async function (req, res, next) {
         try {

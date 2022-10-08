@@ -37,7 +37,6 @@ export class AuthInterceptor implements HttpInterceptor {
                   }));
                 }),
                 catchError((err: HttpErrorResponse) => {
-                  console.log("RefreshTokenError======")
                   this.authService.removeTokens();
                   this.router.navigate(['/login']);
                   return throwError(() => err);
