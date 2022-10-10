@@ -44,6 +44,11 @@ module.exports = function (sequelize, Sequelize) {
             type: Sequelize.TEXT,
             allowNull: false
         },
+        is_seen: {
+            type: Sequelize.INTEGER(11),
+            defaultValue: 0,
+            allowNull: false
+        },
         delete_for_me: {
             type: Sequelize.INTEGER(11),
             allowNull: false,

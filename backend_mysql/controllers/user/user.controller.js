@@ -92,7 +92,7 @@ class UserController {
             searchText = searchText?.trim();
             if (!searchText) throw createError.NotFound("Search Item is required.");
 
-            const query = `SELECT u.id, um.full_name AS fullName, um.pro_pic AS proPic, um.last_login as lastLogin, u.email 
+            const query = `SELECT u.id as userId, um.full_name AS fullName, um.pro_pic AS proPic, um.last_login as lastLogin, u.email 
                     FROM users u INNER JOIN usermeta um ON u.id = um.user_id WHERE (um.full_name LIKE "%${searchText}%" OR um.phone_no LIKE "%${searchText}%") 
                     AND u.id <> ${id} ORDER BY u.email;`;
             const searchedData = await dbOperation.select(query);

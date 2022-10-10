@@ -42,6 +42,8 @@
 
 .contacts {
   background-color: #ffffff;
+  padding-left: 0;
+  padding-right: 0;
 }
 
 .contact-table-scroll {
@@ -150,4 +152,19 @@
 
 .left-btn {
   margin-right: 10px;
+}
+
+.not-seen {
+  font-size: 12px;
+  float: right;
+}
+
+.seen {
+  font-size: 12px;
+  float: right;
+  color: #00a884;
+}
+
+.sent-tick {
+  font-size: 10px !important;
 }
