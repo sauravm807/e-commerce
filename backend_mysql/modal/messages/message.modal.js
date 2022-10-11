@@ -23,7 +23,6 @@ module.exports = function (sequelize, Sequelize) {
             references: {
                 model: 'users',
                 key: 'id'
-
             }
         },
         rid: {
@@ -47,16 +46,16 @@ module.exports = function (sequelize, Sequelize) {
         is_seen: {
             type: Sequelize.INTEGER(11),
             defaultValue: 0,
-            allowNull: false
+            // allowNull: false
         },
         delete_for_me: {
             type: Sequelize.INTEGER(11),
-            allowNull: false,
+            // allowNull: false,
             defaultValue: 0
         },
         permanently_deleted: {
             type: Sequelize.INTEGER(11),
-            allowNull: false,
+            // allowNull: false,
             defaultValue: 0
         }
     }, {

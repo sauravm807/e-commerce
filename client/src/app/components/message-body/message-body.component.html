@@ -103,13 +103,13 @@
             </button>
           </div>
           <div class="col-sm-9">
-            <form action="">
-              <input type="text" class="form-control" placeholder="Write message...">
+            <form [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
+              <input type="text" class="form-control" placeholder="Write message..."  formControlName="message">
             </form>
 
           </div>
           <div class="col-sm-1 mt-1">
-            <button class="send-btn">
+            <button class="send-btn" (click)="onSendMessage()">
               <i class="fa fa-paper-plane"></i>
             </button>
           </div>

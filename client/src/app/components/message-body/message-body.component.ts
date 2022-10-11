@@ -1,4 +1,5 @@
 import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { debounceTime, distinctUntilChanged, fromEvent, map } from 'rxjs';
@@ -22,8 +23,8 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   basePath: string = "";
   usersList: Array<any> = [];
   usersListCopy: Array<any> = [];
-  currentFriend: any = [];
-  onlineUserArr: any = [];
+  currentFriend: any = {};
+  // onlineUserArr: any = [];
   messageList: any = [];
 
   @ViewChild('search') search: any;
@@ -68,17 +69,15 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     this.scrollToBottom();
     this.socketService.setupSocketConnection();
     this.getUpdatedUsers();
+    this.onGetMessage();
   }
 
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
 
-  ngOnDestroy() {
-    this.socketService.disconnect();
-  }
-
   ngAfterViewInit() {
+    // this.onGetMessage();
     const searchTerm = fromEvent<any>(this.search.nativeElement, 'keyup').pipe(
       map(event => event.target.value.trim()),
       debounceTime(500),
@@ -112,6 +111,11 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
         this.usersList = this.usersListCopy;
       }
     });
+
+  }
+
+  ngOnDestroy() {
+    this.socketService.disconnect();
   }
 
   getUpdatedUsers() {
@@ -186,6 +190,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   onShowMessage(user: any) {
     this.showMessages = true;
     this.currentFriend = user;
+
     if (this.currentFriend.chatId) {
       this.messageService.getMessageByChatId(this.currentFriend.chatId)
         .pipe(map(val => {
@@ -205,21 +210,22 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
         });
     } else {
       this.messageService.getMessageByUserId(this.currentFriend.userId)
-      .pipe(map(val => {
-        val.data.forEach((elem: any) => {
-          elem["isSent"] = elem.sender === this.userData?.id;
-          elem["c_date"] = elem["c_date"] * 1000;
+        .pipe(map(val => {
+          val.data.forEach((elem: any) => {
+            elem["isSent"] = elem.sender === this.userData?.id;
+            elem["c_date"] = elem["c_date"] * 1000;
+          });
+          return val
+        }))
+        .subscribe({
+          next: res => {
+            this.messageList = res.data;
+            this.currentFriend["chatId"] = res?.chatId;
+          },
+          error: err => {
+            this.messageList = [];
+          }
         });
-        return val
-      }))
-      .subscribe({
-        next: res => {
-          this.messageList = res.data;
-        },
-        error: err => {
-          this.messageList = [];
-        }
-      });
     }
   }
 
@@ -250,6 +256,9 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  /**
+   * uploadProfileImage - to upload profile pic
+   */
   uploadProfileImage(imageData: any) {
     this.userService.uploadProfilePic(imageData).subscribe({
       next: res => {
@@ -259,11 +268,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
         console.log(err);
       }
     })
-  }
-
-  onImgError(event: Event) {
-    let imgLink = this.userService.handleImageError();
-    (event.target as HTMLInputElement).src = imgLink;
   }
 
   refreshUserData() {
@@ -278,9 +282,50 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   // }
 
   scrollToBottom() {
-    if(this.myScrollContainer?.nativeElement) {
+    if (this.myScrollContainer?.nativeElement) {
       this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
     }
+  }
+
+  messageForm = new FormGroup({
+    message: new FormControl('', { validators: Validators.required })
+  });
+
+  onSendMessage() {
+    if (!this.messageForm.value.message?.trim()) return;
+    const userId = this.userData.id;
+    const friendUserId = this.currentFriend.userId;
+    const chatId = this.currentFriend.chatId;
+    const message = this.messageForm.value.message?.trim();
+
+    const messageData = {
+      sender: userId,
+      receiver: friendUserId,
+      message: message,
+      chatId: chatId ? chatId : null,
+      c_date: new Date().getTime()
+    };
+
+    this.messageList.push({ ...messageData, isSeen: false, isSent: true });
+
+    this.socketService.sendMessage(messageData);
+    // this.onGetMessage();
+  }
+  // count = 0;
+  onGetMessage() {
+    this.socketService.chatObsMessage.subscribe(res => {
+      console.log("res", res)
+      this.messageList.push({ ...res, isSeen: false, isSent: false });
+      // this.count++;
+      // console.log(this.count);
+    });
+    this.socketService.chatObsMessage
+
+  }
+
+  onImgError(event: Event) {
+    let imgLink = this.userService.handleImageError();
+    (event.target as HTMLInputElement).src = imgLink;
   }
 
 }

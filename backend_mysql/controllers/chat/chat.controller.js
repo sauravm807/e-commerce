@@ -84,7 +84,7 @@ class ChatController {
             const { id } = req.user;
             if (!userId || !Number(userId)) throw createError.NotFound("User id is required and should be a number.")
             let query = `SELECT 
-                            m.id, m.sid AS sender, m.rid AS receiver, m.c_date, m.message, m.is_seen AS isSeen
+                            m.id, m.chat_id AS chatId, m.sid AS sender, m.rid AS receiver, m.c_date, m.message, m.is_seen AS isSeen
                         FROM messages m WHERE (m.sid = ${id} AND m.rid = ${userId}) OR (m.sid = ${userId} AND m.rid = ${id})`;
 
             const data = await dbOperation.select(query);
@@ -93,6 +93,7 @@ class ChatController {
             res.status(200).json({
                 status:200,
                 message: "Messages found successfully",
+                chatId: data[0].chatId,
                 data: data
             });
         } catch (error) {

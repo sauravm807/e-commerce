@@ -13,6 +13,8 @@ export class SocketioService {
   onlineUsersList: any = [];
   private onlineUsers = new BehaviorSubject([]);
   onlineUsersMessage = this.onlineUsers.asObservable();
+  private chatObs = new BehaviorSubject({});
+  chatObsMessage = this.chatObs.asObservable();
 
   constructor(private authService: AuthService) {
     this.authService.userDataMessage.subscribe({
@@ -38,13 +40,30 @@ export class SocketioService {
   }
 
   logoutAll() {
-    this.socket.emit("logout all", this.userId);
+    this.socket.emit("logoutAll", this.userId);
   }
 
   getOnlineUsers() {
-    this.socket.on("update users", (usersData: any) => {
+    this.socket.on("updateUsers", (usersData: any) => {
       this.onlineUsersList = usersData.users;
       this.onlineUsers.next(usersData);
     });
   }
+
+  sendMessage(data: any) {
+    this.socket.emit("sendMessage", data);
+    this.getMessages();
+  }
+
+
+  getMessages() {
+    this.socket.on("createdMessageData", (messageData: any) => {
+      console.log("messageData=========")
+      if (messageData) {
+        this.chatObs.next(messageData);
+        return;
+      }
+    });
+  }
+
 }
