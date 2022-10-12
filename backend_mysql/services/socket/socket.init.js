@@ -17,7 +17,7 @@ module.exports = function (server) {
         socket.on('joinUser', async (userId) => {
             try {
                 const currTime = Math.round(new Date().getTime() / 1000);
-                await dbOperation.update(`Update usermeta set last_login = ${currTime} where user_id = ${userId};`);
+                await dbOperation.update(`UPDATE usermeta SET last_login = ${currTime} WHERE user_id = ${userId};`);
                 users.push({ userId, lastLogin: currTime });
                 connections.push({ socketId: socket.id, userId });
                 users = [...new Map(users.map(item => [item['userId'], item])).values()];
@@ -35,7 +35,7 @@ module.exports = function (server) {
             try {
                 const userId = connections.find(elem => elem.socketId === socket.id)?.userId;
                 const currTime = Math.round(new Date().getTime() / 1000);
-                await dbOperation.update(`Update usermeta set last_login = ${currTime} where user_id = ${userId};`);
+                await dbOperation.update(`UPDATE usermeta SET last_login = ${currTime} WHERE user_id = ${userId};`);
                 connections = connections.filter(elem => elem.socketId !== socket.id);
                 const index = connections.findIndex(elem => elem.userId === userId);
                 if (index && index === -1) {
@@ -56,7 +56,7 @@ module.exports = function (server) {
         socket.on('logoutAll', async (id) => {
             try {
                 const currTime = Math.round(new Date().getTime() / 1000);
-                await dbOperation.update(`Update usermeta set last_login = ${currTime} where user_id = ${id};`);
+                await dbOperation.update(`UPDATE usermeta SET last_login = ${currTime} WHERE user_id = ${id};`);
                 const index = users.findIndex(elem => elem.userId === id);
                 const usersDisconnected = users.splice(index, 1);
                 disconnectedUsers.push(usersDisconnected[0]);
@@ -69,34 +69,46 @@ module.exports = function (server) {
             }
         });
 
-        socket.on('sendMessage', async (data) => {
+        socket.on('message', async (data) => {
             try {
-                let { chatId, sender, receiver, message, c_date } = data;
+                let { chatId, sender, receiver, message, c_date, isSeen } = data;
                 c_date = Math.round(c_date / 1000);
                 let query = "";
                 if (chatId) {
-                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message) VALUES
-                                (${chatId}, ${sender}, ${receiver}, ${c_date} ,"${message}");`;
-
+                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
+                                (${chatId}, ${sender}, ${receiver}, ${c_date} ,"${message}", ${isSeen});`;
+                    // console.log("1===", query)
                     // const insert1 = await dbOperation.insert(query);
-                    //console.log("insert /1===", insert1)
-                    console.log("createdmessageData", { ...data })
-                    io.emit("createdMessageData", data);
+                    io.emit("message", data);
                 } else {
                     query = `INSERT INTO chats (user1, user2) VALUES (${sender}, ${receiver});`;
-
                     // const insertedData = await dbOperation.insert(query);
-                    // query = `INSERT INTO messages (chat_id, sid, rid, c_date, message) VALUES
-                    //             (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}");`;
+                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
+                    (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
+                    // console.log("2===", query)
 
                     // const insert2 = await dbOperation.insert(query);
-                    // console.log("insert1====", insert2)
-                    // io.emit("createdmessageData", { ...data, chatId: insertedData[0]});
+                    io.emit("message", { ...data, chatId: 17});
                 }
-
             } catch (error) {
                 console.log(error);
             }
         });
+
+        socket.on("updateSeenMessage", async (user) => {
+            try {
+                // console.log(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`)
+                // await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
+                
+                io.emit("updateSeenMessage", user)
+            } catch (error) {
+                console.log(error);                    
+            }
+        });
+
+        // socket.on("chattingId", (id) => {
+        //     console.log("getUserChattingId======")
+        //     io.emit("chattingId", id);
+        // });
     });
 }

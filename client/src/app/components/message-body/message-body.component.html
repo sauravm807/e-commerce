@@ -51,7 +51,7 @@
                     </td>
                     <td>
                       <strong>{{user.fullName}}</strong><br>
-                      <small>{{ifSearchFriendList ? "@" + user.username : user.message}}</small>
+                      <small [ngClass]="!user?.isSeen && !user?.isSent? 'not-seen-msg' : ''">{{ifSearchFriendList ? "@" + user.username : user.message}}</small>
                       <span *ngIf="user?.isSent" [ngClass]="user?.isSeen ? 'seen' : 'not-seen'">
                         <i class="fa fa-check" aria-hidden="true"></i>
                       </span>

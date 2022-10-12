@@ -159,6 +159,10 @@
   float: right;
 }
 
+.not-seen-msg {
+  font-weight: bold;
+}
+
 .seen {
   font-size: 12px;
   float: right;

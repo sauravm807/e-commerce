@@ -17,7 +17,6 @@ const router = require("./routers/main.router");
 
 const db = require("./connection/sql.connection");
 const jobSchedule = require("./cronJob/job.schedule");
-const logger = require('../backend_mysql/error/logger');
 const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
@@ -70,7 +69,6 @@ app.use((req, res, next) => {
  */
 app.use((err, req, res, next) => {
     // console.log(err)
-    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     return res.status(err.status || 500).json({
         error: {
             status: err.status || 500,

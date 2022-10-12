@@ -22,10 +22,14 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   userData: any = {};
   basePath: string = "";
   usersList: Array<any> = [];
+  messageList: any = [];
   usersListCopy: Array<any> = [];
   currentFriend: any = {};
-  // onlineUserArr: any = [];
-  messageList: any = [];
+  chattingWithUserId!: number;
+
+  messageForm = new FormGroup({
+    message: new FormControl('', { validators: Validators.required })
+  });
 
   @ViewChild('search') search: any;
   @ViewChild('scrollMe')
@@ -53,7 +57,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
           elem["username"] = elem.email.split("@")[0];
           elem.isSent = elem.sid === this.userData?.id;
         });
-        return val
+        return val;
       }))
       .subscribe({
         next: res => {
@@ -70,6 +74,8 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     this.socketService.setupSocketConnection();
     this.getUpdatedUsers();
     this.onGetMessage();
+    this.onUpdateSeenMessage();
+    // this.getUserChattingId();
   }
 
   ngAfterViewChecked() {
@@ -77,7 +83,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   }
 
   ngAfterViewInit() {
-    // this.onGetMessage();
     const searchTerm = fromEvent<any>(this.search.nativeElement, 'keyup').pipe(
       map(event => event.target.value.trim()),
       debounceTime(500),
@@ -111,7 +116,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
         this.usersList = this.usersListCopy;
       }
     });
-
   }
 
   ngOnDestroy() {
@@ -189,7 +193,17 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
    */
   onShowMessage(user: any) {
     this.showMessages = true;
+
     this.currentFriend = user;
+    console.log(this.currentFriend)
+
+    this.socketService.updateSeenMessages({
+      userId: this.userData?.id,
+      sender: user.userId,
+      receiver: this.userData?.id
+    });
+
+    // this.socketService.isChattingUserId(user.userId);
 
     if (this.currentFriend.chatId) {
       this.messageService.getMessageByChatId(this.currentFriend.chatId)
@@ -198,11 +212,13 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
             elem["isSent"] = elem.sender === this.userData?.id;
             elem["c_date"] = elem["c_date"] * 1000;
           });
-          return val
+          return val;
         }))
         .subscribe({
           next: res => {
             this.messageList = res.data;
+            const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId && elem.userId === user.sid);
+            if (index > -1) this.usersList[index].isSeen = 1;
           },
           error: err => {
             this.messageList = [];
@@ -215,7 +231,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
             elem["isSent"] = elem.sender === this.userData?.id;
             elem["c_date"] = elem["c_date"] * 1000;
           });
-          return val
+          return val;
         }))
         .subscribe({
           next: res => {
@@ -287,41 +303,65 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  messageForm = new FormGroup({
-    message: new FormControl('', { validators: Validators.required })
-  });
-
   onSendMessage() {
     if (!this.messageForm.value.message?.trim()) return;
     const userId = this.userData.id;
     const friendUserId = this.currentFriend.userId;
     const chatId = this.currentFriend.chatId;
     const message = this.messageForm.value.message?.trim();
-
+    // console.log(friendUserId === this.chattingWithUserId)
     const messageData = {
       sender: userId,
       receiver: friendUserId,
       message: message,
       chatId: chatId ? chatId : null,
-      c_date: new Date().getTime()
+      c_date: new Date().getTime(),
+      isSeen: friendUserId === this.chattingWithUserId ? 1 : 0
     };
 
-    this.messageList.push({ ...messageData, isSeen: false, isSent: true });
+    this.messageList.push({ ...messageData, isSent: true });
 
     this.socketService.sendMessage(messageData);
-    // this.onGetMessage();
-  }
-  // count = 0;
-  onGetMessage() {
-    this.socketService.chatObsMessage.subscribe(res => {
-      console.log("res", res)
-      this.messageList.push({ ...res, isSeen: false, isSent: false });
-      // this.count++;
-      // console.log(this.count);
-    });
-    this.socketService.chatObsMessage
 
+    this.messageForm.patchValue({
+      message: ""
+    });
   }
+
+  onGetMessage() {
+    this.socketService.getMessages().subscribe((res: any) => {
+      if (this.currentFriend.userId === res.sender && this.userData?.id === res.receiver) {
+        this.messageList.push({ ...res, isSeen: false, isSent: false });
+      }
+      if (this.userData.id === res.receiver) {
+        const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
+        this.usersList[index].message = res.message;
+        this.usersList[index].isSent = false;
+        this.usersList[index].isSeen = 0;
+      }
+    });
+  }
+
+  onUpdateSeenMessage() {
+    this.socketService.updateSeenMsg().subscribe((user: any) => {
+
+      const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId && elem.rid == user.userId);
+      if (index !== -1) this.usersList[index].isSeen = 1;
+
+      this.messageList.map((elem: any) => {
+        if (elem.sender === user.sender && elem.receiver === user.receiver) {
+          elem["isSeen"] = 1;
+        }
+        return elem;
+      });
+    });
+  }
+
+  // getUserChattingId() {
+  //   this.socketService.getUserChattingId().subscribe((id: any) => {
+  //     console.log(id)
+  //   });
+  // }
 
   onImgError(event: Event) {
     let imgLink = this.userService.handleImageError();

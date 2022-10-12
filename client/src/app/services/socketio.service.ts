@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Observer } from 'rxjs';
 import { io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
@@ -13,13 +13,11 @@ export class SocketioService {
   onlineUsersList: any = [];
   private onlineUsers = new BehaviorSubject([]);
   onlineUsersMessage = this.onlineUsers.asObservable();
-  private chatObs = new BehaviorSubject({});
-  chatObsMessage = this.chatObs.asObservable();
 
   constructor(private authService: AuthService) {
     this.authService.userDataMessage.subscribe({
       next: (res: any) => {
-        this.userId = res.id
+        this.userId = res.id;
       }
     });
   }
@@ -51,19 +49,42 @@ export class SocketioService {
   }
 
   sendMessage(data: any) {
-    this.socket.emit("sendMessage", data);
-    this.getMessages();
+    this.socket.emit("message", data);
   }
-
 
   getMessages() {
-    this.socket.on("createdMessageData", (messageData: any) => {
-      console.log("messageData=========")
-      if (messageData) {
-        this.chatObs.next(messageData);
-        return;
-      }
+    return new Observable((observer: Observer<any>) => {
+      this.socket.on('message', (messageData: any) => {
+        observer.next(messageData);
+      });
     });
   }
+
+  updateSeenMessages(user: any) {
+    this.socket.emit("updateSeenMessage", user)
+  }
+
+  updateSeenMsg() {
+    return new Observable((observer: Observer<any>) => {
+      this.socket.on('updateSeenMessage', (user: any) => {
+        observer.next(user);
+      });
+    });
+  }
+
+  // isChattingUserId(id: any) {
+  //   this.socket.emit("chattingId", id);
+  // }
+
+  // getUserChattingId() {
+  //   console.log("getUserChattingId======")
+  //   return new Observable((observer: Observer<any>) => {
+  //     this.socket.on("chattingId", (id: any) => {
+  //       observer.next(id);
+  //     });
+  //   });
+  // }
+
+
 
 }
