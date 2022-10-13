@@ -73,22 +73,21 @@ module.exports = function (server) {
             try {
                 let { chatId, sender, receiver, message, c_date, isSeen } = data;
                 c_date = Math.round(c_date / 1000);
+                console.log({ chatId, sender, receiver, message, c_date, isSeen });
                 let query = "";
                 if (chatId) {
                     query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
                                 (${chatId}, ${sender}, ${receiver}, ${c_date} ,"${message}", ${isSeen});`;
-                    // console.log("1===", query)
                     // const insert1 = await dbOperation.insert(query);
                     io.emit("message", data);
                 } else {
                     query = `INSERT INTO chats (user1, user2) VALUES (${sender}, ${receiver});`;
                     // const insertedData = await dbOperation.insert(query);
-                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
-                    (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
-                    // console.log("2===", query)
+                    // query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
+                    // (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
 
                     // const insert2 = await dbOperation.insert(query);
-                    io.emit("message", { ...data, chatId: 17});
+                    io.emit("message", { ...data, chatId: 17 });
                 }
             } catch (error) {
                 console.log(error);
@@ -97,12 +96,11 @@ module.exports = function (server) {
 
         socket.on("updateSeenMessage", async (user) => {
             try {
-                // console.log(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`)
                 // await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
-                
+
                 io.emit("updateSeenMessage", user)
             } catch (error) {
-                console.log(error);                    
+                console.log(error);
             }
         });
 

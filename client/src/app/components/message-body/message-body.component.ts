@@ -75,7 +75,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     this.getUpdatedUsers();
     this.onGetMessage();
     this.onUpdateSeenMessage();
-    // this.getUserChattingId();
   }
 
   ngAfterViewChecked() {
@@ -192,18 +191,19 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
    * onShowMessage - for showing messages section
    */
   onShowMessage(user: any) {
+    $(document.body).on('click', '.chat-names-left', function () {
+      $('.message_input').focus();
+    });
+
     this.showMessages = true;
 
     this.currentFriend = user;
-    console.log(this.currentFriend)
 
     this.socketService.updateSeenMessages({
       userId: this.userData?.id,
       sender: user.userId,
       receiver: this.userData?.id
     });
-
-    // this.socketService.isChattingUserId(user.userId);
 
     if (this.currentFriend.chatId) {
       this.messageService.getMessageByChatId(this.currentFriend.chatId)
@@ -217,7 +217,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
         .subscribe({
           next: res => {
             this.messageList = res.data;
-            const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId && elem.userId === user.sid);
+            const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId); // && elem.userId === user.sid
             if (index > -1) this.usersList[index].isSeen = 1;
           },
           error: err => {
@@ -303,13 +303,14 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     }
   }
 
+  firstMessage: boolean = false;
+
   onSendMessage() {
     if (!this.messageForm.value.message?.trim()) return;
     const userId = this.userData.id;
     const friendUserId = this.currentFriend.userId;
     const chatId = this.currentFriend.chatId;
     const message = this.messageForm.value.message?.trim();
-    // console.log(friendUserId === this.chattingWithUserId)
     const messageData = {
       sender: userId,
       receiver: friendUserId,
@@ -319,7 +320,16 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
       isSeen: friendUserId === this.chattingWithUserId ? 1 : 0
     };
 
+    if (!chatId) {
+      this.ifSearchFriendList = false;
+      this.firstMessage = true;
+    }
+
     this.messageList.push({ ...messageData, isSent: true });
+    const index = this.usersList.findIndex(elem => elem.chatId === chatId);
+    this.usersList[index].message = message;
+    this.usersList[index].isSeen = 0;
+    this.usersList[index].isSent = true;
 
     this.socketService.sendMessage(messageData);
 
@@ -330,22 +340,32 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
   onGetMessage() {
     this.socketService.getMessages().subscribe((res: any) => {
+      console.log(res)
       if (this.currentFriend.userId === res.sender && this.userData?.id === res.receiver) {
-        this.messageList.push({ ...res, isSeen: false, isSent: false });
+        this.messageList.push({ ...res, isSeen: 0, isSent: false });
       }
-      if (this.userData.id === res.receiver) {
-        const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
-        this.usersList[index].message = res.message;
-        this.usersList[index].isSent = false;
-        this.usersList[index].isSeen = 0;
+
+      if (this.firstMessage) {
+        this.usersList.unshift({ ...res, isSeen: 0, isSent: false });
+      } else {
+        if (this.userData.id === res.receiver) {
+          const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
+          if (index > -1) {
+            this.usersList[index].message = res.message;
+            this.usersList[index].isSent = false;
+            this.usersList[index].isSeen = 0;
+          }
+        }
       }
+
+
     });
   }
 
   onUpdateSeenMessage() {
     this.socketService.updateSeenMsg().subscribe((user: any) => {
 
-      const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId && elem.rid == user.userId);
+      const index = this.usersList.findIndex((elem: any) => elem.userId === user.userId); // && elem.rid == user.userId
       if (index !== -1) this.usersList[index].isSeen = 1;
 
       this.messageList.map((elem: any) => {
@@ -356,12 +376,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
       });
     });
   }
-
-  // getUserChattingId() {
-  //   this.socketService.getUserChattingId().subscribe((id: any) => {
-  //     console.log(id)
-  //   });
-  // }
 
   onImgError(event: Event) {
     let imgLink = this.userService.handleImageError();

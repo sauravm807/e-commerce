@@ -72,19 +72,4 @@ export class SocketioService {
     });
   }
 
-  // isChattingUserId(id: any) {
-  //   this.socket.emit("chattingId", id);
-  // }
-
-  // getUserChattingId() {
-  //   console.log("getUserChattingId======")
-  //   return new Observable((observer: Observer<any>) => {
-  //     this.socket.on("chattingId", (id: any) => {
-  //       observer.next(id);
-  //     });
-  //   });
-  // }
-
-
-
 }

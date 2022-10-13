@@ -26,7 +26,7 @@ class ChatController {
                         SELECT MAX(m.id)
                         FROM messages m
                         GROUP BY m.chat_id
-                    )`;
+                    ) ORDER BY chatDate DESC;`;
                     
             const data = await dbOperation.select(query);
 
