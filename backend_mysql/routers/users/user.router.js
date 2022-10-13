@@ -38,6 +38,6 @@ userRouter.post("/upload/propic", userController.uploadProfilePic);
 
 userRouter.post("/search", userController.searchUser);
 
-userRouter.get("/friends", userController.getUsers);
+// userRouter.get("/friends", userController.getUsers);
 
 module.exports = userRouter;

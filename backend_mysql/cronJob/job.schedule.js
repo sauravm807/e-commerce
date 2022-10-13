@@ -1,5 +1,4 @@
 const cron = require('node-cron');
-const logger = require('../error/logger');
 const {
     EVERY_30_SECONDS,
     EVERY_MINUTE,
@@ -27,17 +26,15 @@ const jobSchedule = async () => {
         try {
             console.log("cron started========")
             const data = await dbOperation.select("SELECT uuid, refreshtoken_expires_time FROM uuids;");
-            // if (data.length) {
-                data.forEach(async element => {
-                    console.log("element.refreshtoken_expires_time", element.refreshtoken_expires_time);
-                    console.log("cron time", Math.round(new Date().getTime() / 1000));
-                    if (element.refreshtoken_expires_time < Math.round(new Date().getTime() / 1000)) {
-                        await dbOperation.delete(`DELETE FROM uuids WHERE uuid = "${element.uuid}"`);
-                    }
-                });
-            // }
+            data.forEach(async element => {
+                console.log("element.refreshtoken_expires_time", element.refreshtoken_expires_time);
+                console.log("cron time", Math.round(new Date().getTime() / 1000));
+                if (element.refreshtoken_expires_time < Math.round(new Date().getTime() / 1000)) {
+                    await dbOperation.delete(`DELETE FROM uuids WHERE uuid = "${element.uuid}"`);
+                }
+            });
         } catch (error) {
-            logger.error(`${error.status || 500} - ${error.message} - 'error in deleting'`);
+            console.log(error);
         }
     })
 }

@@ -8,8 +8,8 @@
           accept=".png, .jpg, .jpeg" required ngModel #cngPic="ngModel">
       </div>
       <div class="mt-2 btn-div col-sm-10" style="margin-right: 0;">
-        <input type="text" class="form-control search-input" placeholder="Search here..." #search
-          (click)="onClickRemoveSearch()">
+        <input type="text" class="form-control search-input" placeholder="Search here..." #search>
+          <!-- (click)="onClickRemoveSearch()"> -->
       </div>
     </div>
 
@@ -51,11 +51,12 @@
                     </td>
                     <td>
                       <strong>{{user.fullName}}</strong><br>
-                      <small>{{ifSearchFriendList ? "@" + user.username :"achi chal rahi"}}</small>
+                      <small [ngClass]="!user?.isSeen && !user?.isSent? 'not-seen-msg' : ''">{{ifSearchFriendList ? "@" + user.username : user.message}}</small>
+                      <span *ngIf="user?.isSent" [ngClass]="user?.isSeen ? 'seen' : 'not-seen'">
+                        <i class="fa fa-check" aria-hidden="true"></i>
+                      </span>
                     </td>
-                    <!-- <td [ngClass]="ifSearchFriendList ? 'd-hidden' : ''"> -->
                     <td>
-                      <!-- <small></small> -->
                       <small [ngClass]="user.isOnline ? 'd-online' : ''">
                         {{user.isOnline ? "●" : ""}}
                       </small>
@@ -70,82 +71,23 @@
 
     </div>
     <div class="col-sm-8 message-area" *ngIf="showMessages">
-      <div class="message-table-scroll">
+      <div class="message-table-scroll" #scrollMe>
         <ng-container *ngIf="showMessages">
           <table class="table">
             <tbody>
-              <tr class="chat-names">
-                <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                    Hello Rahul <span class="chat-time">11:20 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class=sent-msg>
-                  <p class="p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                    Hello Sonam How are You <span class="chat-time">11:21 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class="sent-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                    Main achi hu tum kaise ho Lorem ipsum dolor sit, amet consectetur adipisicing elit. Illum ab quis
-                    quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam
-                    repellendus
-                    in mollitia error. Nulla officia fuga iure sunt! Lorem ipsum dolor sit, amet consectetur adipisicing
-                    elit. Illum ab quis
-                    quisquam nihil aliquam corporis sint eveniet, sequi aut iste ullam? Optio, eaque eius nam
-                    repellendus
-                    in mollitia error. Nulla officia fuga iure sunt!<span class="chat-time">11:21 PM</span></p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                    Suna hai tumhari Job chali gayi ya chhod di tumne
-                    <span class="chat-time">11:22 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class=sent-msg>
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">Haan Lockdown ki wajah
-                    se company me kuch problem ho rahi thi so kuch logo ko resign dene ko kaha gaya tha.. meri
-                    condition thodi thik hai to maine socha main hi kar deta hu.. mere pas paisa bahot hai...
-                    <span class="chat-time">11:24 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                    acha <span class="chat-time">11:24 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class=sent-msg>
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                    Haan <span class="chat-time">11:25 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class=sent-msg>
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-right">
-                    aur tumhari job kaisi chali rahi <span class="chat-time">11:26 PM</span>
-                  </p>
-                </td>
-              </tr>
-              <tr class="chat-names">
-                <td class="get-msg">
-                  <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
-                    achi chal rahi <span class="chat-time">11:26 PM</span>
-                  </p>
-                </td>
-              </tr>
+              <ng-container *ngFor="let msg of messageList">
+                <tr class="chat-names" >
+                  <td [ngClass]="msg.isSent ? 'sent-msg' : 'get-msg'">
+                    <p class=" p-2 mt-2 mr-5 shadow-sm text-white float-left">
+                      {{msg.message}}
+                      <span class="chat-time">
+                        {{msg.c_date | date: "h:mm a"}}&nbsp;
+                        <i *ngIf="msg.isSent" [ngClass]="msg.isSeen ? 'sent-tick seen' : 'sent-tick not-seen'" class="fa fa-check" aria-hidden="true"></i>
+                      </span>
+                    </p>
+                  </td><!--11:20 PM-->
+                </tr>
+              </ng-container>
             </tbody>
           </table>
         </ng-container>
@@ -161,13 +103,13 @@
             </button>
           </div>
           <div class="col-sm-9">
-            <form action="">
-              <input type="text" class="form-control" placeholder="Write message...">
+            <form [formGroup]="messageForm" (ngSubmit)="onSendMessage()">
+              <input type="text" class="form-control message_input" placeholder="Write message..."  formControlName="message">
             </form>
 
           </div>
           <div class="col-sm-1 mt-1">
-            <button class="send-btn">
+            <button class="send-btn" (click)="onSendMessage()">
               <i class="fa fa-paper-plane"></i>
             </button>
           </div>

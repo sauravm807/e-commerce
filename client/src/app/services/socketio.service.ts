@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, Observer } from 'rxjs';
 import { io } from 'socket.io-client';
 import { environment } from 'src/environments/environment';
 import { AuthService } from './auth.service';
@@ -17,7 +17,7 @@ export class SocketioService {
   constructor(private authService: AuthService) {
     this.authService.userDataMessage.subscribe({
       next: (res: any) => {
-        this.userId = res.id
+        this.userId = res.id;
       }
     });
   }
@@ -38,13 +38,38 @@ export class SocketioService {
   }
 
   logoutAll() {
-    this.socket.emit("logout all", this.userId);
+    this.socket.emit("logoutAll", this.userId);
   }
 
   getOnlineUsers() {
-    this.socket.on("update users", (usersData: any) => {
+    this.socket.on("updateUsers", (usersData: any) => {
       this.onlineUsersList = usersData.users;
       this.onlineUsers.next(usersData);
     });
   }
+
+  sendMessage(data: any) {
+    this.socket.emit("message", data);
+  }
+
+  getMessages() {
+    return new Observable((observer: Observer<any>) => {
+      this.socket.on('message', (messageData: any) => {
+        observer.next(messageData);
+      });
+    });
+  }
+
+  updateSeenMessages(user: any) {
+    this.socket.emit("updateSeenMessage", user)
+  }
+
+  updateSeenMsg() {
+    return new Observable((observer: Observer<any>) => {
+      this.socket.on('updateSeenMessage', (user: any) => {
+        observer.next(user);
+      });
+    });
+  }
+
 }

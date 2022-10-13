@@ -38,6 +38,10 @@ const routes: Routes = [
   {
     path: "messages/:id",
     component: MessageBodyComponent, canActivate: [AuthGuard]
+  },
+  {
+    path: "**",
+    redirectTo: "login"
   }
 ];
 
