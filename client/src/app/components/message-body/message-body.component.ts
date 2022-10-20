@@ -19,13 +19,13 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
   showMessages: boolean = false;
   showInput: boolean = true;
   ifSearchFriendList: boolean = false;
-  userData: any = {};
+  firstMessage: boolean = false;
   basePath: string = "";
-  usersList: Array<any> = [];
-  messageList: any = [];
-  usersListCopy: Array<any> = [];
+  userData: any = {};
   currentFriend: any = {};
-  chattingWithUserId!: number;
+  messageList: Array<any> = [];
+  usersList: Array<any> = [];
+  usersListCopy: Array<any> = [];
 
   messageForm = new FormGroup({
     message: new FormControl('', { validators: Validators.required })
@@ -49,6 +49,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
     this.authService.userDataMessage.subscribe(res => {
       this.userData = res;
+      this.userData["username"] = this.userData.email.split("@")[0];
     });
 
     this.messageService.getLatestMessageListUser()
@@ -199,6 +200,8 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
     this.currentFriend = user;
 
+    this.socketService.updateConnectedUsers(this.userData.id, this.currentFriend.userId);
+
     this.socketService.updateSeenMessages({
       userId: this.userData?.id,
       sender: user.userId,
@@ -225,6 +228,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
           }
         });
     } else {
+
       this.messageService.getMessageByUserId(this.currentFriend.userId)
         .pipe(map(val => {
           val.data.forEach((elem: any) => {
@@ -303,21 +307,17 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  firstMessage: boolean = false;
-
   onSendMessage() {
-    if (!this.messageForm.value.message?.trim()) return;
-    const userId = this.userData.id;
-    const friendUserId = this.currentFriend.userId;
-    const chatId = this.currentFriend.chatId;
     const message = this.messageForm.value.message?.trim();
+    if (!message) return;
+    const chatId = this.currentFriend.chatId;
     const messageData = {
-      sender: userId,
-      receiver: friendUserId,
+      sender: this.userData.id,
+      receiver: this.currentFriend.userId,
       message: message,
       chatId: chatId ? chatId : null,
       c_date: new Date().getTime(),
-      isSeen: friendUserId === this.chattingWithUserId ? 1 : 0
+      isSeen: 0
     };
 
     if (!chatId) {
@@ -325,13 +325,18 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
       this.firstMessage = true;
     }
 
-    this.messageList.push({ ...messageData, isSent: true });
-    const index = this.usersList.findIndex(elem => elem.chatId === chatId);
-    this.usersList[index].message = message;
-    this.usersList[index].isSeen = 0;
-    this.usersList[index].isSent = true;
+    this.socketService.sendMessage(messageData, this.userData);
 
-    this.socketService.sendMessage(messageData);
+    let subs = this.socketService.getMessages().subscribe((res: any) => {
+      if (!res?.isFirstMessage) {
+        this.messageList.push({ ...messageData, isSeen: res.isSeen, isSent: true });
+        const index = this.usersList.findIndex(elem => elem.chatId === chatId);
+        this.usersList[index].message = message;
+        this.usersList[index].isSeen = res.isSeen;
+        this.usersList[index].isSent = true;
+      }
+      subs.unsubscribe();
+    });
 
     this.messageForm.patchValue({
       message: ""
@@ -340,25 +345,52 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
   onGetMessage() {
     this.socketService.getMessages().subscribe((res: any) => {
-      console.log(res)
       if (this.currentFriend.userId === res.sender && this.userData?.id === res.receiver) {
-        this.messageList.push({ ...res, isSeen: 0, isSent: false });
+        this.messageList.push({ ...res, isSeen: res.isSeen, isSent: false });
       }
+      
+      if (res?.isFirstMessage) {
+        if (Object.keys(this.currentFriend).length) {
+          this.usersListCopy.push({
+            ...this.currentFriend,
+            sid: res.sender,
+            rid: res.receiver,
+            chatId: res.chatId,
+            chatDate: res.c_date,
+            message: res.message,
+            isSeen: res.isSeen,
+            isSent: this.userData.id === res.receiver ? false : true
+          });
+        } else {
+          if (res.receiver === this.userData.id) this.usersListCopy.push({
+            email: res.email,
+            fullName: res.fullName,
+            isOnline: res.isOnline,
+            lastLogin: res.lastLogin,
+            proPic: res.proPic,
+            userId: res.id,
+            username: res.username,
+            sid: res.sender,
+            rid: res.receiver,
+            chatId: res.chatId,
+            chatDate: res.c_date,
+            message: res.message,
+            isSeen: res.isSeen,
+            isSent: this.userData.id === res.receiver ? false : true
+          });
+        }
 
-      if (this.firstMessage) {
-        this.usersList.unshift({ ...res, isSeen: 0, isSent: false });
+        this.usersList = this.usersListCopy.reverse();
       } else {
         if (this.userData.id === res.receiver) {
           const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
           if (index > -1) {
             this.usersList[index].message = res.message;
             this.usersList[index].isSent = false;
-            this.usersList[index].isSeen = 0;
+            this.usersList[index].isSeen = res.isSeen;
           }
         }
       }
-
-
     });
   }
 

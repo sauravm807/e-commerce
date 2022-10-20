@@ -5,6 +5,7 @@ let users = [];
 let disconnectedUsers = [];
 let connections = [];
 const dbOperation = require("../../connection/sql.connection");
+let map = new Map();
 
 module.exports = function (server) {
     const io = new Server(server, {
@@ -69,25 +70,35 @@ module.exports = function (server) {
             }
         });
 
-        socket.on('message', async (data) => {
+        socket.on('message', async ({ data, userData }) => {
             try {
                 let { chatId, sender, receiver, message, c_date, isSeen } = data;
                 c_date = Math.round(c_date / 1000);
-                console.log({ chatId, sender, receiver, message, c_date, isSeen });
+                if (map.get(receiver) === sender) {
+                    isSeen = 1;
+                    data.isSeen = 1;
+                    io.emit("isConnected", 1);
+                } else {
+                    isSeen = 0;
+                    data.isSeen = 0;
+                    io.emit("isConnected", 0);
+                }
+
                 let query = "";
                 if (chatId) {
                     query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
                                 (${chatId}, ${sender}, ${receiver}, ${c_date} ,"${message}", ${isSeen});`;
-                    // const insert1 = await dbOperation.insert(query);
+                    const insert1 = await dbOperation.insert(query);
                     io.emit("message", data);
                 } else {
                     query = `INSERT INTO chats (user1, user2) VALUES (${sender}, ${receiver});`;
-                    // const insertedData = await dbOperation.insert(query);
-                    // query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
-                    // (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
+                    const insertedData = await dbOperation.insert(query);
+                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
+                    (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
 
-                    // const insert2 = await dbOperation.insert(query);
-                    io.emit("message", { ...data, chatId: 17 });
+                    const insert2 = await dbOperation.insert(query);
+                    
+                    io.emit("message", { ...data, ...userData, chatId: 2, isFirstMessage: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -96,17 +107,16 @@ module.exports = function (server) {
 
         socket.on("updateSeenMessage", async (user) => {
             try {
-                // await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
+                await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
 
-                io.emit("updateSeenMessage", user)
+                io.emit("updateSeenMessage", user);
             } catch (error) {
                 console.log(error);
             }
         });
 
-        // socket.on("chattingId", (id) => {
-        //     console.log("getUserChattingId======")
-        //     io.emit("chattingId", id);
-        // });
+        socket.on("connectedUser", (arr) => {
+            map.set(arr[0], arr[1]);
+        });
     });
 }

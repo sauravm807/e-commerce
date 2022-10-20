@@ -48,8 +48,8 @@ export class SocketioService {
     });
   }
 
-  sendMessage(data: any) {
-    this.socket.emit("message", data);
+  sendMessage(data: any, userData: any) {
+    this.socket.emit("message", { data, userData });
   }
 
   getMessages() {
@@ -70,6 +70,10 @@ export class SocketioService {
         observer.next(user);
       });
     });
+  }
+
+  updateConnectedUsers(id1: any, id2: any) {
+    this.socket.emit("connectedUser", [id1, id2]);
   }
 
 }
