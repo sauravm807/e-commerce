@@ -375,7 +375,7 @@ class AuthController {
             let smsBody = `this is your verification code: ${randomnumber}`;
             let sms = await sendSMS('+13605646827', '+917008444956', smsBody)
             if (!sms) throw createError.BadRequest("Something went wrong!");
-            console.log(sms, 'sms sent');
+            // console.log(sms, 'sms sent');
             let setotp = await redisService.setVerificationOtp(randomnumber.toString(), verifyuser.email);
 
             // let updateOtp = await User.update({

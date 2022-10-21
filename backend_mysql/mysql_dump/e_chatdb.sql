@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               10.4.24-MariaDB - mariadb.org binary distribution
--- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- Server version:               8.0.30-0ubuntu0.22.04.1 - (Ubuntu)
+-- Server OS:                    Linux
+-- HeidiSQL Version:             12.1.0.6537
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -16,51 +16,52 @@
 
 
 -- Dumping database structure for e_chatdb
-CREATE DATABASE IF NOT EXISTS `e_chatdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 */;
+DROP DATABASE IF EXISTS `e_chatdb`;
+CREATE DATABASE IF NOT EXISTS `e_chatdb` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `e_chatdb`;
 
 -- Dumping structure for table e_chatdb.chats
+DROP TABLE IF EXISTS `chats`;
 CREATE TABLE IF NOT EXISTS `chats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user1` int(11) NOT NULL,
-  `user2` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user1` int NOT NULL,
+  `user2` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   UNIQUE KEY `chats_user1_user2` (`user1`,`user2`),
   KEY `user2` (`user2`),
   CONSTRAINT `chats_ibfk_1` FOREIGN KEY (`user1`) REFERENCES `users` (`id`),
   CONSTRAINT `chats_ibfk_2` FOREIGN KEY (`user2`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table e_chatdb.chats: ~2 rows (approximately)
-DELETE FROM `chats`;
 INSERT INTO `chats` (`id`, `user1`, `user2`) VALUES
 	(1, 1, 2),
 	(2, 1, 3);
 
 -- Dumping structure for table e_chatdb.messages
+DROP TABLE IF EXISTS `messages`;
 CREATE TABLE IF NOT EXISTS `messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `chat_id` int(11) NOT NULL,
-  `sid` int(11) NOT NULL,
-  `rid` int(11) NOT NULL,
-  `c_date` int(11) NOT NULL DEFAULT current_timestamp(),
+  `id` int NOT NULL AUTO_INCREMENT,
+  `chat_id` int NOT NULL,
+  `sid` int NOT NULL,
+  `rid` int NOT NULL,
+  `c_date` int NOT NULL,
   `message` text NOT NULL,
-  `is_seen` int(11) NOT NULL DEFAULT 0,
-  `delete_for_me` int(11) NOT NULL DEFAULT 0,
-  `permanently_deleted` int(11) NOT NULL DEFAULT 0,
+  `is_seen` int NOT NULL DEFAULT '0',
+  `delete_for_me` int NOT NULL DEFAULT '0',
+  `permanently_deleted` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id` (`id`),
   KEY `chat_id` (`chat_id`),
   KEY `sid` (`sid`),
   KEY `rid` (`rid`),
-  CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sid`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`rid`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`chat_id`) REFERENCES `chats` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`sid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`rid`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table e_chatdb.messages: ~10 rows (approximately)
-DELETE FROM `messages`;
+-- Dumping data for table e_chatdb.messages: ~12 rows (approximately)
 INSERT INTO `messages` (`id`, `chat_id`, `sid`, `rid`, `c_date`, `message`, `is_seen`, `delete_for_me`, `permanently_deleted`) VALUES
 	(1, 1, 1, 2, 1665213855, 'hi', 1, 0, 0),
 	(2, 1, 2, 1, 1665214013, 'hello', 1, 0, 0),
@@ -68,36 +69,38 @@ INSERT INTO `messages` (`id`, `chat_id`, `sid`, `rid`, `c_date`, `message`, `is_
 	(4, 2, 3, 1, 1665214030, 'hi', 1, 0, 0),
 	(5, 1, 2, 1, 1665214235, 'I am fine thankyou. What about you??', 1, 0, 0),
 	(6, 2, 1, 3, 1665214255, 'hello', 1, 0, 0),
-	(7, 1, 1, 2, 1665214267, 'Mee too...', 0, 0, 0),
+	(7, 1, 1, 2, 1665214267, 'Mee too...', 1, 0, 0),
 	(8, 2, 3, 1, 1665214276, 'how are you?', 1, 0, 0),
 	(9, 2, 1, 3, 1665214284, 'I am fine how are you??', 1, 0, 0),
-	(10, 2, 3, 1, 1665214292, 'Mee too...', 1, 0, 0);
+	(10, 2, 3, 1, 1665214292, 'Mee too...', 1, 0, 0),
+	(12, 2, 3, 2, 1666270539, 'hello', 1, 0, 0),
+	(13, 2, 1, 3, 1666270584, 'hello', 1, 0, 0);
 
 -- Dumping structure for table e_chatdb.usermeta
+DROP TABLE IF EXISTS `usermeta`;
 CREATE TABLE IF NOT EXISTS `usermeta` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
   `full_name` varchar(255) DEFAULT NULL,
   `first_name` varchar(255) DEFAULT NULL,
   `last_name` varchar(255) DEFAULT NULL,
   `pro_pic` varchar(255) DEFAULT NULL,
   `phone_no` varchar(255) NOT NULL,
   `address` varchar(255) DEFAULT NULL,
-  `last_login` int(11) DEFAULT NULL,
-  `created_at` int(11) NOT NULL DEFAULT current_timestamp(),
-  `updated_at` int(11) NOT NULL DEFAULT current_timestamp(),
+  `last_login` int DEFAULT NULL,
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `phone_no` (`phone_no`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `usermeta_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2501 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `usermeta_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=2501 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table e_chatdb.usermeta: ~2,343 rows (approximately)
-DELETE FROM `usermeta`;
+-- Dumping data for table e_chatdb.usermeta: ~2,500 rows (approximately)
 INSERT INTO `usermeta` (`id`, `user_id`, `full_name`, `first_name`, `last_name`, `pro_pic`, `phone_no`, `address`, `last_login`, `created_at`, `updated_at`) VALUES
-	(1, 1, 'Saurav Vishal', 'Saurav', 'Vishal', '1-1664882009597.jpeg', '+919342234765', 'Bhilai India', 1665407724, 1664871730, 1664871730),
-	(2, 2, 'Miss Wendell Morissette', 'Miss', 'Wendell', '2-1665389398332.png', '+912366318323', '5949 West South Pansyberg Georgia', 1665407727, 1642521412, 1642521412),
-	(3, 3, 'Ricky Dickinson', 'Ricky', 'Dickinson', '3-1664882559242.jpeg', '+914081379888', '5001 West East Willystead South Carolina', 1665406510, 1657368200, 1657368200),
+	(1, 1, 'Saurav Vishal', 'Saurav', 'Vishal', '1-1664882009597.jpeg', '+919342234765', 'Bhilai India', 1666270798, 1664871730, 1664871730),
+	(2, 2, 'Miss Wendell Morissette', 'Miss', 'Wendell', '2-1665389398332.png', '+912366318323', '5949 West South Pansyberg Georgia', 1666270739, 1642521412, 1642521412),
+	(3, 3, 'Ricky Dickinson', 'Ricky', 'Dickinson', '3-1664882559242.jpeg', '+914081379888', '5001 West East Willystead South Carolina', 1666270799, 1657368200, 1657368200),
 	(4, 4, 'Melissa Klocko', 'Melissa', 'Klocko', NULL, '+915069189955', '1055 East DuBuquebury Hawaii', 1665203929, 1663041503, 1663041503),
 	(5, 5, 'Mattie Turner', 'Mattie', 'Turner', NULL, '+912728295021', '526 South West Aurelia New Hampshire', NULL, 1636035490, 1636035490),
 	(6, 6, 'Angelo Orn', 'Angelo', 'Orn', NULL, '+912758813451', '0183 North Woodland Wyoming', NULL, 1656917218, 1656917218),
@@ -2597,18 +2600,18 @@ INSERT INTO `usermeta` (`id`, `user_id`, `full_name`, `first_name`, `last_name`,
 	(2500, 2500, 'Edgar Stamm', 'Edgar', 'Stamm', NULL, '+919700092334', '815 North Roseville Nevada', NULL, 1641562992, 1641562992);
 
 -- Dumping structure for table e_chatdb.users
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL AUTO_INCREMENT,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) DEFAULT NULL,
-  `created_at` int(11) NOT NULL DEFAULT current_timestamp(),
-  `updated_at` int(11) NOT NULL DEFAULT current_timestamp(),
+  `created_at` int NOT NULL,
+  `updated_at` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2501 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=2501 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table e_chatdb.users: ~2,295 rows (approximately)
-DELETE FROM `users`;
+-- Dumping data for table e_chatdb.users: ~2,500 rows (approximately)
 INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `updated_at`) VALUES
 	(1, 'sauravvishal@globussoft.in', '$2b$10$qBx9mDyRh2F0.AS.cyQR6u5Zq/V4m0GKE/vgUaBuFYh/PSNlz5uYO', 1664871730, 1664871730),
 	(2, 'misswendellmorissette_koss@gmail.com', '$2b$10$U7XmnXOS4thoj3skmFWdAe2dy15Cq9uoegy6PD6uHNKY9RQo1Bj7y', 1642521412, 1642521412),
@@ -5112,37 +5115,33 @@ INSERT INTO `users` (`id`, `email`, `password`, `created_at`, `updated_at`) VALU
 	(2500, 'edgarstamm.connelly@hotmail.com', '$2b$10$PIlGgvTG6ptTOxJSaTZdBe.Xng/OQIj3ShZu8CYkljYVNiLbeTnn2', 1641562992, 1641562992);
 
 -- Dumping structure for table e_chatdb.uuids
+DROP TABLE IF EXISTS `uuids`;
 CREATE TABLE IF NOT EXISTS `uuids` (
-  `user_id` int(11) NOT NULL,
+  `user_id` int NOT NULL,
   `uuid` varchar(255) NOT NULL,
   `token` longtext NOT NULL,
-  `refreshtoken_expires_time` int(11) NOT NULL,
-  `created_at` int(11) NOT NULL DEFAULT current_timestamp(),
+  `refreshtoken_expires_time` int NOT NULL,
+  `created_at` int NOT NULL,
   PRIMARY KEY (`uuid`),
   UNIQUE KEY `uuid` (`uuid`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `uuids_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `uuids_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Dumping data for table e_chatdb.uuids: ~0 rows (approximately)
-DELETE FROM `uuids`;
 
 -- Dumping structure for table e_chatdb.wrong_passwords
+DROP TABLE IF EXISTS `wrong_passwords`;
 CREATE TABLE IF NOT EXISTS `wrong_passwords` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `wrong_pass_count` int(11) NOT NULL DEFAULT 0,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `wrong_pass_count` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`),
-  CONSTRAINT `wrong_passwords_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4;
+  CONSTRAINT `wrong_passwords_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table e_chatdb.wrong_passwords: ~3 rows (approximately)
-DELETE FROM `wrong_passwords`;
-INSERT INTO `wrong_passwords` (`id`, `user_id`, `wrong_pass_count`) VALUES
-	(1, 1, 0),
-	(2, 3, 0),
-	(3, 11, 0);
+-- Dumping data for table e_chatdb.wrong_passwords: ~0 rows (approximately)
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

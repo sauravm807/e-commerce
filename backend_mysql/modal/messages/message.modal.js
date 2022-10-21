@@ -36,7 +36,7 @@ module.exports = function (sequelize, Sequelize) {
         },
         c_date: {
             type: Sequelize.INTEGER(11),
-            defaultValue: Sequelize.fn('NOW'),
+            // defaultValue: Sequelize.fn('NOW'),
             allowNull: false
         },
         message: {
@@ -46,16 +46,16 @@ module.exports = function (sequelize, Sequelize) {
         is_seen: {
             type: Sequelize.INTEGER(11),
             defaultValue: 0,
-            // allowNull: false
+            allowNull: false
         },
         delete_for_me: {
             type: Sequelize.INTEGER(11),
-            // allowNull: false,
+            allowNull: false,
             defaultValue: 0
         },
         permanently_deleted: {
             type: Sequelize.INTEGER(11),
-            // allowNull: false,
+            allowNull: false,
             defaultValue: 0
         }
     }, {

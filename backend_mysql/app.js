@@ -5,11 +5,11 @@ const app = express();
 
 const createError = require('http-errors');
 
-const cors = require('cors')
+const cors = require('cors');
 
 const morgan = require('morgan');
 
-require('dotenv').config()
+require('dotenv').config();
 
 const PORT = process.env.PORT || 8088;
 
@@ -21,7 +21,7 @@ const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
 
-app.use(cors())
+app.use(cors());
 
 app.use(express.json({
     limit: "50mb",
