@@ -102,17 +102,17 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
           )
           .subscribe({
             next: res => {
-              this.ifSearchFriendList = true;
+              // this.ifSearchFriendList = true;
               this.usersList = res;
               this.getUpdatedUsers();
             },
             error: err => {
-              this.usersList = []
+              this.usersList = [];
             }
           });
       } else {
         this.showMessages = false;
-        this.ifSearchFriendList = false;
+        // this.ifSearchFriendList = true ;
         this.usersList = this.usersListCopy;
       }
     });
@@ -328,8 +328,22 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     this.socketService.sendMessage(messageData, this.userData);
 
     let subs = this.socketService.getMessages().subscribe((res: any) => {
+      this.messageList.push({ ...messageData, isSeen: res.isSeen, isSent: true });
+      
+      if (!this.ifSearchFriendList) {
+        this.usersList = [];
+        this.usersList.push({
+          ...this.currentFriend,
+          sid: res.sender,
+          rid: res.receiver,
+          chatId: res.chatId,
+          chatDate: res.c_date,
+          message: res.message,
+          isSeen: res.isSeen,
+          isSent: this.userData.id === res.receiver ? false : true
+        });
+      }
       if (!res?.isFirstMessage) {
-        this.messageList.push({ ...messageData, isSeen: res.isSeen, isSent: true });
         const index = this.usersList.findIndex(elem => elem.chatId === chatId);
         this.usersList[index].message = message;
         this.usersList[index].isSeen = res.isSeen;
@@ -345,49 +359,61 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
   onGetMessage() {
     this.socketService.getMessages().subscribe((res: any) => {
+      console.log(this.ifSearchFriendList);
       if (this.currentFriend.userId === res.sender && this.userData?.id === res.receiver) {
         this.messageList.push({ ...res, isSeen: res.isSeen, isSent: false });
       }
-      
-      if (res?.isFirstMessage) {
-        if (Object.keys(this.currentFriend).length) {
-          this.usersListCopy.push({
-            ...this.currentFriend,
-            sid: res.sender,
-            rid: res.receiver,
-            chatId: res.chatId,
-            chatDate: res.c_date,
-            message: res.message,
-            isSeen: res.isSeen,
-            isSent: this.userData.id === res.receiver ? false : true
-          });
-        } else {
-          if (res.receiver === this.userData.id) this.usersListCopy.push({
-            email: res.email,
-            fullName: res.fullName,
-            isOnline: res.isOnline,
-            lastLogin: res.lastLogin,
-            proPic: res.proPic,
-            userId: res.id,
-            username: res.username,
-            sid: res.sender,
-            rid: res.receiver,
-            chatId: res.chatId,
-            chatDate: res.c_date,
-            message: res.message,
-            isSeen: res.isSeen,
-            isSent: this.userData.id === res.receiver ? false : true
-          });
+      if (this.userData.id === res.receiver || this.userData.id === res.sender) {
+        if (this.ifSearchFriendList) {
+          this.usersListCopy = [];
+          this.ifSearchFriendList = false;
         }
-
-        this.usersList = this.usersListCopy.reverse();
-      } else {
-        if (this.userData.id === res.receiver) {
-          const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
-          if (index > -1) {
-            this.usersList[index].message = res.message;
-            this.usersList[index].isSent = false;
-            this.usersList[index].isSeen = res.isSeen;
+        if (res?.isFirstMessage) {
+          if (Object.keys(this.currentFriend).length) {
+            this.usersListCopy.push({
+              ...this.currentFriend,
+              sid: res.sender,
+              rid: res.receiver,
+              chatId: res.chatId,
+              chatDate: res.c_date,
+              message: res.message,
+              isSeen: res.isSeen,
+              isSent: this.userData.id === res.receiver ? false : true
+            });
+            this.currentFriend["chatId"] = res.chatId;
+            this.usersList = this.usersListCopy.reverse();
+          } else {
+            if (res.receiver === this.userData.id) {
+              this.usersListCopy.push({
+                email: res.email,
+                fullName: res.fullName,
+                isOnline: res.isOnline,
+                lastLogin: res.lastLogin,
+                proPic: res.proPic,
+                userId: res.id,
+                username: res.username,
+                sid: res.sender,
+                rid: res.receiver,
+                chatId: res.chatId,
+                chatDate: res.c_date,
+                message: res.message,
+                isSeen: res.isSeen,
+                isSent: this.userData.id === res.receiver ? false : true
+              });
+              this.currentFriend["chatId"] = res.chatId;
+              this.usersList = this.usersListCopy.reverse();
+            }
+          }
+          // this.currentFriend["chatId"] = res.chatId;
+          // this.usersList = this.usersListCopy.reverse();
+        } else {
+          if (this.userData.id === res.receiver) {
+            const index = this.usersList.findIndex((elem: any) => elem.userId === res.sender);
+            if (index > -1) {
+              this.usersList[index].message = res.message;
+              this.usersList[index].isSent = false;
+              this.usersList[index].isSeen = res.isSeen;
+            }
           }
         }
       }
