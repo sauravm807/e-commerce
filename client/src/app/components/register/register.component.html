@@ -1,37 +1,37 @@
 <div class="container front-container1">
   <div class="container login-top">
     <div class="header">Register</div>
-    <form action="#">
+    <form [formGroup]="userRegisterForm" (submit)="onRegister()">
       <div class="field input-field">
-        <input type="email" required>
+        <input type="email" formControlName="email" required>
         <label>Email Address</label>
       </div>
       <div class="field input-field">
-        <input type="password" autocomplete="new-password" required>
+        <input type="password" autocomplete="new-password" formControlName="password" required>
         <label>Password</label>
       </div>
       <div class="field input-field">
-        <input type="password" autocomplete="new-password" required>
+        <input type="password" autocomplete="new-password" formControlName="rePassword" required>
         <label>Re-Enter Password</label>
       </div>
       <div class="field input-field">
-        <input type="text" required>
+        <input type="text" formControlName="fullname" required>
         <label>Full Name</label>
       </div>
       <div class="field input-field">
-        <input type="text" required>
+        <input type="text" formControlName="firstname" required>
         <label>First Name</label>
       </div>
       <div class="field input-field">
-        <input type="text" required>
+        <input type="text" formControlName="lastname" required>
         <label>Last Name</label>
       </div>
       <div class="field input-field">
-        <input type="text" required>
+        <input type="text" formControlName="address" required>
         <label>Address</label>
       </div>
       <div class="field input-field">
-        <input type="text" required>
+        <input type="text" formControlName="mobile" required>
         <label>Mobile Number</label>
       </div>
       <div class="field button-field">
