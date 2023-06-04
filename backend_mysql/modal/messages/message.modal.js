@@ -23,7 +23,6 @@ module.exports = function (sequelize, Sequelize) {
             references: {
                 model: 'users',
                 key: 'id'
-
             }
         },
         rid: {
@@ -37,11 +36,16 @@ module.exports = function (sequelize, Sequelize) {
         },
         c_date: {
             type: Sequelize.INTEGER(11),
-            defaultValue: Sequelize.fn('NOW'),
+            // defaultValue: Sequelize.fn('NOW'),
             allowNull: false
         },
         message: {
             type: Sequelize.TEXT,
+            allowNull: false
+        },
+        is_seen: {
+            type: Sequelize.INTEGER(11),
+            defaultValue: 0,
             allowNull: false
         },
         delete_for_me: {

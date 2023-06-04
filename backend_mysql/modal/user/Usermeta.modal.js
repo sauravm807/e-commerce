@@ -41,12 +41,12 @@ module.exports = function (sequelize, Sequelize) {
         },
         created_at: {
             type: Sequelize.INTEGER(11),
-            defaultValue: Sequelize.fn('NOW'),
+            // defaultValue: Sequelize.fn('NOW'),
             allowNull: false
         },
         updated_at: {
             type: Sequelize.INTEGER(11),
-            defaultValue: Sequelize.fn('NOW'),
+            // defaultValue: Sequelize.fn('NOW'),
             allowNull: false
         }
     }, {

@@ -5,11 +5,11 @@ const app = express();
 
 const createError = require('http-errors');
 
-const cors = require('cors')
+const cors = require('cors');
 
 const morgan = require('morgan');
 
-require('dotenv').config()
+require('dotenv').config();
 
 const PORT = process.env.PORT || 8088;
 
@@ -17,12 +17,11 @@ const router = require("./routers/main.router");
 
 const db = require("./connection/sql.connection");
 const jobSchedule = require("./cronJob/job.schedule");
-const logger = require('../backend_mysql/error/logger');
 const sms = require('./services/sms.service');
 
 require("./connection/redis.connection");
 
-app.use(cors())
+app.use(cors());
 
 app.use(express.json({
     limit: "50mb",
@@ -69,8 +68,7 @@ app.use((req, res, next) => {
  * error handler
  */
 app.use((err, req, res, next) => {
-    console.log(err)
-    logger.error(`${err.status || 500} - ${res.statusMessage} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    // console.log(err)
     return res.status(err.status || 500).json({
         error: {
             status: err.status || 500,
