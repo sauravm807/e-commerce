@@ -30,7 +30,7 @@ class ChatController {
                     
             const data = await dbOperation.select(query);
 
-            if (!data.length) {
+            if (!data?.length) {
                 query = `SELECT 
                                 u.id, u.email, um.full_name as fullName, um.pro_pic as proPic, um.last_login as lastLogin 
                             FROM users u INNER JOIN usermeta um on u.id = um.user_id 

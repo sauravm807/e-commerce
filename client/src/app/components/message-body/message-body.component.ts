@@ -199,6 +199,7 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
     this.showMessages = true;
 
     this.currentFriend = user;
+    this.currentFriend.userId = user.id;
 
     this.socketService.updateConnectedUsers(this.userData.id, this.currentFriend.userId);
 
@@ -359,7 +360,6 @@ export class MessageBodyComponent implements OnInit, AfterViewChecked {
 
   onGetMessage() {
     this.socketService.getMessages().subscribe((res: any) => {
-      console.log(this.ifSearchFriendList);
       if (this.currentFriend.userId === res.sender && this.userData?.id === res.receiver) {
         this.messageList.push({ ...res, isSeen: res.isSeen, isSent: false });
       }
