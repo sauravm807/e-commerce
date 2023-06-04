@@ -93,15 +93,13 @@ module.exports = function (server) {
                     io.emit("message", data);
                 } else {
                     query = `INSERT INTO chats (user1, user2) VALUES (${sender}, ${receiver});`;
-                    // const insertedData = await dbOperation.insert(query);
-                    // query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
-                    // (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
-
-                    // const insert2 = await dbOperation.insert(query);
+                    const insertedData = await dbOperation.insert(query);
                     
-                    // io.emit("message", { ...data, ...userData, chatId: insertedData[0], isFirstMessage: true });
+                    query = `INSERT INTO messages (chat_id, sid, rid, c_date, message, is_seen) VALUES
+                                (${insertedData[0]}, ${sender}, ${receiver}, ${c_date}, "${message}", ${isSeen});`;
 
-                    io.emit("message", { ...data, ...userData, chatId: 26, isFirstMessage: true });
+                    const insert2 = await dbOperation.insert(query);
+                    io.emit("message", { ...data, ...userData, chatId: insertedData[0], isFirstMessage: true });
                 }
             } catch (error) {
                 console.log(error);
@@ -110,7 +108,7 @@ module.exports = function (server) {
 
         socket.on("updateSeenMessage", async (user) => {
             try {
-                // await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
+                await dbOperation.update(`UPDATE messages SET is_seen = 1 WHERE sid = ${user.sender} AND rid = ${user.receiver};`);
 
                 io.emit("updateSeenMessage", user);
             } catch (error) {
